@@ -49,5 +49,8 @@ class AuthRepository {
     fun logoutUser() {
         firebaseAuth.signOut()
     }
+    fun isUserLoggedIn(): Boolean {
+        return firebaseAuth.currentUser != null
+    }
 
 }

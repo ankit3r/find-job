@@ -21,5 +21,8 @@ class AuthViewModel : ViewModel(){
         authRepository.logoutUser()
     }
 
+    fun isLogin():Boolean{
+        return authRepository.isUserLoggedIn()
+    }
 
 }

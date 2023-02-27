@@ -1,5 +1,6 @@
 package com.gyanhub.finde_job.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -22,5 +23,12 @@ class FragmentHolderActivity : AppCompatActivity() {
         val fragmentTransient = supportFragmentManager.beginTransaction()
         fragmentTransient.replace(R.id.frameLayout, fragment)
         fragmentTransient.commit()
+    }
+    public override fun onStart() {
+        super.onStart()
+       if( authViewModel.isLogin()){
+           startActivity(Intent(this,MainActivity::class.java))
+           finish()
+       }
     }
 }

@@ -68,6 +68,7 @@ class LoginFragment : Fragment() {
                 binding.cardProgress.visibility = View.GONE
                 val intent = Intent(activity, MainActivity::class.java)
                 startActivity(intent)
+                requireActivity().finish()
             } else {
                 Toast.makeText(context, "error $error", Toast.LENGTH_SHORT).show()
                 binding.ProgressBar.visibility = View.GONE
