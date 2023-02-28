@@ -10,4 +10,7 @@
     <string name="filter">filter</string>
     <string name="search">Search</string>
     <string name="hintSearchMess">search job internship</string>
+    <string name="applied">Applied</string>
+    <string name="menu">Menu</string>
+    <string name="home">Home</string>
 </resources>
