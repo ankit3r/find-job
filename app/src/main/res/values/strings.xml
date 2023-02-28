@@ -6,4 +6,8 @@
     <string name="sign_up">sign up</string>
     <string name="enter_password">Enter Password</string>
     <string name="enter_email">Enter Email</string>
+    <string name="profile">profile</string>
+    <string name="filter">filter</string>
+    <string name="search">Search</string>
+    <string name="hintSearchMess">search job internship</string>
 </resources>

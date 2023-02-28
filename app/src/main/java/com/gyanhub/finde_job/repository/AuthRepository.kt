@@ -19,7 +19,7 @@ class AuthRepository {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val user = User(name, email, firebaseAuth.uid.toString(),listOf(), listOf())
+                    val user = User(name, email, firebaseAuth.uid.toString(), listOf(), listOf())
                     firestore.collection("users").document(firebaseAuth.currentUser!!.uid)
                         .set(user)
                         .addOnCompleteListener { task ->
@@ -49,6 +49,7 @@ class AuthRepository {
     fun logoutUser() {
         firebaseAuth.signOut()
     }
+
     fun isUserLoggedIn(): Boolean {
         return firebaseAuth.currentUser != null
     }

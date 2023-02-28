@@ -1,7 +1,6 @@
 package com.gyanhub.finde_job.fragments
 
 
-
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -23,14 +22,14 @@ import com.gyanhub.finde_job.viewModle.AuthViewModel
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
     private lateinit var viewModel: AuthViewModel
-   private lateinit var imm : InputMethodManager
+    private lateinit var imm: InputMethodManager
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentLoginBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
-         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         binding.btnSignUpPage.setOnClickListener {
             viewModel.fragment = SignUpFragment()
             replaceFragment(viewModel.fragment)
@@ -48,7 +47,7 @@ class LoginFragment : Fragment() {
         transaction.commit()
     }
 
-    private fun checkFiled(view:View) {
+    private fun checkFiled(view: View) {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
         if (binding.editTextTextEmailAddress.text.isEmpty()) {
             binding.editTextTextEmailAddress.error = "Required"
@@ -87,16 +86,17 @@ class LoginFragment : Fragment() {
         }
 
     }
- fun hideKeyBoard(eTxt:EditText){
-    eTxt.setOnEditorActionListener { _, actionId, _ ->
-         if (actionId == EditorInfo.IME_ACTION_DONE) {
-             imm.hideSoftInputFromWindow(eTxt.windowToken, 0)
-             eTxt.clearFocus()
-             return@setOnEditorActionListener true
-         }
-         return@setOnEditorActionListener false
-     }
- }
+
+    fun hideKeyBoard(eTxt: EditText) {
+        eTxt.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                imm.hideSoftInputFromWindow(eTxt.windowToken, 0)
+                eTxt.clearFocus()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+    }
 
 
 }

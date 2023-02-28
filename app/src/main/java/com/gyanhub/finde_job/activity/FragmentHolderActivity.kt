@@ -11,7 +11,7 @@ import com.gyanhub.finde_job.fragments.SignUpFragment
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 
 class FragmentHolderActivity : AppCompatActivity() {
-     lateinit var authViewModel: AuthViewModel
+    lateinit var authViewModel: AuthViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fragment_holder)
@@ -24,11 +24,12 @@ class FragmentHolderActivity : AppCompatActivity() {
         fragmentTransient.replace(R.id.frameLayout, fragment)
         fragmentTransient.commit()
     }
+
     public override fun onStart() {
         super.onStart()
-       if( authViewModel.isLogin()){
-           startActivity(Intent(this,MainActivity::class.java))
-           finish()
-       }
+        if (authViewModel.isLogin()) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
     }
 }

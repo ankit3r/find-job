@@ -20,7 +20,7 @@ import com.gyanhub.finde_job.viewModle.AuthViewModel
 class SignUpFragment : Fragment() {
     private lateinit var binding: FragmentSignUpBinding
     private lateinit var viewModel: AuthViewModel
-    private lateinit var imm : InputMethodManager
+    private lateinit var imm: InputMethodManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +44,8 @@ class SignUpFragment : Fragment() {
 
         return binding.root
     }
-    private fun checkFiled(view:View) {
+
+    private fun checkFiled(view: View) {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
         if (binding.eTxtNameUp.text.isEmpty()) {
             binding.eTxtNameUp.error = "Required"
@@ -64,12 +65,12 @@ class SignUpFragment : Fragment() {
             binding.eTxtPassUp.text.toString(),
             binding.eTxtNameUp.text.toString()
         ) { success, error ->
-            if (success){
+            if (success) {
                 binding.cardProgress.visibility = View.GONE
                 val intent = Intent(activity, MainActivity::class.java)
                 startActivity(intent)
                 requireActivity().finish()
-            }else{
+            } else {
                 Toast.makeText(context, "error $error", Toast.LENGTH_SHORT).show()
                 binding.ProgressBar.visibility = View.GONE
                 binding.txtError.text = error
@@ -86,7 +87,8 @@ class SignUpFragment : Fragment() {
         }
 
     }
-    fun hideKeyBoard(eTxt:EditText){
+
+    fun hideKeyBoard(eTxt: EditText) {
         eTxt.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 imm.hideSoftInputFromWindow(eTxt.windowToken, 0)
