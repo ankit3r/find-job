@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/post_job"
+                style="@style/menuTextStyle"
+                android:textAlignment="center"/>
+
+            <EditText
+                android:id="@+id/eTxtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:layout_marginTop="20dp"
+                android:hint="@string/job_title"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/eTxtCyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:layout_marginTop="10dp"
+                android:hint="@string/enter_origination_name"
+                android:inputType="textPersonName" />
+
+           <Spinner
+               android:id="@+id/type"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+
+                <EditText
+                    android:id="@+id/eTxtPay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:hint="@string/pay_1000_2000"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:minHeight="50dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp" />
+
+                <EditText
+                    android:id="@+id/eTxtTotalPost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="@string/enter_total_posts"
+                    android:inputType="number"
+                    android:minHeight="50dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp" />
+            </LinearLayout>
+
+
+            <EditText
+                android:id="@+id/eTxtDisc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ems="10"
+                android:hint="@string/enter_job_description"
+                android:gravity="start|center"
+                android:inputType="textMultiLine"
+                android:minHeight="50dp" />
+
+            <EditText
+                android:id="@+id/eTxtSkill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ems="10"
+                android:hint="@string/enter_skill"
+                android:gravity="start|center"
+                android:inputType="textMultiLine"
+                android:minHeight="50dp" />
+
+            <EditText
+                android:id="@+id/eTxtWCA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ems="10"
+               android:hint="@string/enter_who_can_apply"
+                android:gravity="start|center"
+                android:inputType="textMultiLine"
+                android:minHeight="50dp" />
+
+            <EditText
+                android:id="@+id/eTxtWhNo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ems="10"
+                android:hint="@string/enter_whatsapp_no"
+                android:inputType="phone"
+                android:minHeight="50dp" />
+
+            <Button
+                android:id="@+id/btnPostJob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="40dp"
+                android:text="Post Job"
+                android:padding="10dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
