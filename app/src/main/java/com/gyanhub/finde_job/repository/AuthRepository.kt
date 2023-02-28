@@ -14,12 +14,14 @@ class AuthRepository {
         email: String,
         password: String,
         name: String,
+        ph: String,
+
         callback: (Boolean, String) -> Unit
     ) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val user = User(name, email, firebaseAuth.uid.toString(), listOf(), listOf())
+                    val user = User(name, email, firebaseAuth.uid.toString(), ph,"",listOf(), listOf())
                     firestore.collection("users").document(firebaseAuth.currentUser!!.uid)
                         .set(user)
                         .addOnCompleteListener { task ->

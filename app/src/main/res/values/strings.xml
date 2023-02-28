@@ -13,4 +13,8 @@
     <string name="applied">Applied</string>
     <string name="menu">Menu</string>
     <string name="home">Home</string>
+    <string name="your_post">your Post</string>
+    <string name="enter_phone_no">Enter Phone No</string>
+    <string name="enter_full_name">Enter Full Name</string>
+    <string name="or_sign_up_with">- Or sign up with -</string>
 </resources>

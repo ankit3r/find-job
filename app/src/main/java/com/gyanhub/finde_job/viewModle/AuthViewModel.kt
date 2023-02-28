@@ -13,9 +13,10 @@ class AuthViewModel : ViewModel() {
         email: String,
         password: String,
         name: String,
+        ph: String,
         callback: (Boolean, String) -> Unit
     ) {
-        authRepository.registerUser(email, password, name, callback)
+        authRepository.registerUser(email, password, name,ph, callback)
     }
 
     fun loginUser(email: String, password: String, callback: (Boolean, String) -> Unit) {

@@ -64,9 +64,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="Enter Full Name"
+                    android:hint="@string/enter_full_name"
                     android:layout_margin="5dp"
                     android:inputType="textEmailAddress" />
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPhNo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/cardStyle">
+
+                <EditText
+                    android:id="@+id/eTxtPhNoUp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/enter_phone_no"
+                    android:layout_margin="5dp"
+                    android:inputType="phone" />
             </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardEmail"
@@ -121,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
-                android:text="- Or sign up with -"/>
+                android:text="@string/or_sign_up_with"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

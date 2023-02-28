@@ -12,9 +12,14 @@
         android:icon="@drawable/ic_apply"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/navigation_menu"
-        android:title="@string/menu"
-        android:icon="@drawable/ic_menu"
+        android:id="@+id/navigation_job"
+        android:title="@string/your_post"
+        android:icon="@drawable/ic_job"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/navigation_Profile"
+        android:title="@string/profile"
+        android:icon="@drawable/profile_circle"
         app:showAsAction="ifRoom" />
 
 </menu>

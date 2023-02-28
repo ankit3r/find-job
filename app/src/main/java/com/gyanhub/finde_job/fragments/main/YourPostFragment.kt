@@ -6,15 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gyanhub.finde_job.R
-import com.gyanhub.finde_job.databinding.FragmentMenuBinding
+import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 
-class MenuFragment : Fragment() {
-   private lateinit var binding:FragmentMenuBinding
+
+class YourPostFragment : Fragment() {
+    private lateinit var binding: FragmentYourPostBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View{
-        binding = FragmentMenuBinding.inflate(layoutInflater,container,false)
+    ): View {
+        binding = FragmentYourPostBinding.inflate(layoutInflater, container, false)
 
 
         return binding.root

@@ -32,6 +32,7 @@ class SignUpFragment : Fragment() {
         hideKeyBoard(binding.eTxtNameUp)
         hideKeyBoard(binding.eTxtEmailUp)
         hideKeyBoard(binding.eTxtPassUp)
+        hideKeyBoard(binding.eTxtPhNoUp)
         binding.btnBack.setOnClickListener {
             viewModel.fragment = LoginFragment()
             requireActivity().onBackPressed()
@@ -51,6 +52,10 @@ class SignUpFragment : Fragment() {
             binding.eTxtNameUp.error = "Required"
             return
         }
+        if (binding.eTxtPhNoUp.text.isEmpty()) {
+            binding.eTxtPhNoUp.error = "Required"
+            return
+        }
         if (binding.eTxtEmailUp.text.isEmpty()) {
             binding.eTxtEmailUp.error = "Required"
             return
@@ -63,6 +68,7 @@ class SignUpFragment : Fragment() {
         viewModel.registerUser(
             binding.eTxtEmailUp.text.toString(),
             binding.eTxtPassUp.text.toString(),
+            binding.eTxtPhNoUp.text.toString(),
             binding.eTxtNameUp.text.toString()
         ) { success, error ->
             if (success) {
