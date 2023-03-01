@@ -33,7 +33,7 @@ class HomeFragment() : Fragment() {
         jobModel = ViewModelProvider(this)[JobViewModel::class.java]
 
 
-        jobModel.liveData.observe(viewLifecycleOwner){
+        jobModel.getJob.observe(viewLifecycleOwner){
             binding.rcJob.adapter = HomeAdapter(it)
         }
 

@@ -43,9 +43,13 @@ class JobViewModel : ViewModel() {
     }
 
     var data = MutableLiveData<List<Job>>()
-    val liveData: LiveData<List<Job>>
+    val getJob: LiveData<List<Job>>
         get() = data
 
+
+    var data2 = MutableLiveData<List<Job>>()
+    val yourJob: LiveData<List<Job>>
+        get() = data
 
     fun getAllJob() {
         viewModelScope.launch {
@@ -56,6 +60,19 @@ class JobViewModel : ViewModel() {
                data.postValue(liveData)
             }
         }
+    }
+
+    fun getYourJobs(list:List<String> , collback : (Boolean,String) -> Unit){
+      viewModelScope.launch {
+          jobRepository.getYourJob(list){ b, liveData, s ->
+              if (!b){
+                  collback(false,"error")
+                  return@getYourJob
+              }
+              data2.postValue(liveData)
+              collback(true,"error")
+              }
+      }
     }
 
     init {

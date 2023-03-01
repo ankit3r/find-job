@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
+import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
 import com.gyanhub.finde_job.viewModle.JobViewModel
@@ -31,6 +32,19 @@ class YourPostFragment : Fragment() {
         binding.btnPostJob.setOnClickListener {
             bottomSheet()
         }
+        jobPostModel.getYourJobs(listOf("5BMvsr9Hn6VQ67Roi7IJ")){success,erroe ->
+            if (success){
+                jobPostModel.yourJob.observe(viewLifecycleOwner){
+                    binding.rcYourPost.adapter = HomeAdapter(it)
+                    binding.textView.visibility = View.GONE
+                }
+            }else{
+                binding.textView.visibility = View.VISIBLE
+                binding.textView.text = erroe
+            }
+
+        }
+
 
 
 

@@ -1,11 +1,11 @@
 package com.gyanhub.finde_job.repository
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 import com.gyanhub.finde_job.model.Job
 
 class JobRepository {
@@ -73,6 +73,25 @@ class JobRepository {
                 }
                 jobLiveData.addAll(job)
                 callback(true,jobLiveData,"")
+            }
+    }
+
+    suspend fun getYourJob(documentIds:List<String>,callback: (Boolean,List<Job>, String) -> Unit){
+        val jobLiveData = mutableListOf<Job>()
+        firestore.collection("Job")
+            .whereIn(FieldPath.documentId(), documentIds)
+            .get()
+            .addOnSuccessListener { documents ->
+                val job = mutableListOf<Job>()
+                for (document in documents) {
+                    val yourJobData = document.toObject<Job>()
+                    job.add(yourJobData)
+                }
+                jobLiveData.addAll(job)
+                callback(true,jobLiveData,"")
+            }
+            .addOnFailureListener { exception ->
+                callback(false,jobLiveData,exception.message.toString())
             }
     }
 
