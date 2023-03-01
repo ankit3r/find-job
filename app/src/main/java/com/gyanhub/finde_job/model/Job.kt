@@ -11,4 +11,6 @@ data class Job(
     val skils: List<String>,
     val pay : String,
     val jobType:String
-)
+){
+    constructor() : this("", "", "","","","","",listOf(),"","")
+}

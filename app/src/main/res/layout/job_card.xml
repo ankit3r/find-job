@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:backgroundTint="@color/purple_200"
+    style="@style/cardStyle">
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+       <TextView
+           android:id="@+id/cardTextTitle"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           style="@style/menuTextStyle"
+           android:text="@string/app_name"/>
+       <TextView
+           android:id="@+id/cardTxtCyName"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/app_name"
+           android:layout_below="@id/cardTextTitle"/>
+       <TextView
+           android:id="@+id/cardTxtJobType"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/app_name"
+           android:layout_below="@id/cardTxtCyName"/>
+       <TextView
+           android:id="@+id/cardTxtPay"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@string/app_name"
+           android:layout_below="@id/cardTxtJobType"/>
+   </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
