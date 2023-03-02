@@ -2,8 +2,6 @@ package com.gyanhub.finde_job.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gyanhub.finde_job.R
@@ -12,10 +10,7 @@ import com.gyanhub.finde_job.fragments.main.AppliedFragment
 import com.gyanhub.finde_job.fragments.main.HomeFragment
 import com.gyanhub.finde_job.fragments.main.ProfileFragment
 import com.gyanhub.finde_job.fragments.main.YourPostFragment
-import com.gyanhub.finde_job.model.Job
-import com.gyanhub.finde_job.viewModle.JobViewModel
 import com.gyanhub.finde_job.viewModle.MainViewModel
-import com.gyanhub.finde_job.viewModle.UserViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding:ActivityMainBinding

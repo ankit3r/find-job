@@ -27,6 +27,7 @@
                 android:src="@drawable/profile_circle" />
 
             <TextView
+                android:id="@+id/txtUserName"
                 style="@style/menuTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,6 +36,7 @@
                 android:textAlignment="center" />
 
             <TextView
+                android:id="@+id/txtUserPhNo"
                 style="@style/menuTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -42,6 +44,7 @@
                 android:textAlignment="center" />
 
             <TextView
+                android:id="@+id/txtUserEmail"
                 style="@style/menuTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -49,6 +52,7 @@
                 android:textAlignment="center" />
 
             <TextView
+                android:id="@+id/txtUserResume"
                 style="@style/menuTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +61,7 @@
 
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"

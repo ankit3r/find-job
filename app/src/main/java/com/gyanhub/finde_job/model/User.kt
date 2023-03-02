@@ -8,4 +8,6 @@ data class User(
     val resume: String,
     val job: List<String>,
     val youApply: List<String>
-)
+){
+    constructor() : this("","","","","", listOf(), listOf())
+}

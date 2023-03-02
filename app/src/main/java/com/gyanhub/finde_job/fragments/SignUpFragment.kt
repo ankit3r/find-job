@@ -68,8 +68,9 @@ class SignUpFragment : Fragment() {
         viewModel.registerUser(
             binding.eTxtEmailUp.text.toString(),
             binding.eTxtPassUp.text.toString(),
-            binding.eTxtPhNoUp.text.toString(),
-            binding.eTxtNameUp.text.toString()
+            binding.eTxtNameUp.text.toString(),
+            binding.eTxtPhNoUp.text.toString()
+
         ) { success, error ->
             if (success) {
                 binding.cardProgress.visibility = View.GONE

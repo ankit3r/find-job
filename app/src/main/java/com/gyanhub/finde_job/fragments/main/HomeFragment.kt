@@ -1,7 +1,6 @@
 package com.gyanhub.finde_job.fragments.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.RelativeLayout
@@ -9,20 +8,18 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.databinding.FragmentHomeBinding
-import com.gyanhub.finde_job.model.Job
-import com.gyanhub.finde_job.viewModle.JobViewModel
+import com.gyanhub.finde_job.viewModle.DbViewModel
 
 class HomeFragment() : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var filterLayout: RelativeLayout
     private lateinit var searchView: SearchView
-    private lateinit var jobModel: JobViewModel
+    private lateinit var jobModel: DbViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,7 +27,9 @@ class HomeFragment() : Fragment() {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         setHasOptionsMenu(true)
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
-        jobModel = ViewModelProvider(this)[JobViewModel::class.java]
+        jobModel = ViewModelProvider(this)[DbViewModel::class.java]
+
+
 
 
         jobModel.getJob.observe(viewLifecycleOwner){

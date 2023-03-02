@@ -9,18 +9,17 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
-import com.gyanhub.finde_job.viewModle.JobViewModel
+import com.gyanhub.finde_job.viewModle.DbViewModel
 
 
 class YourPostFragment : Fragment() {
     private lateinit var binding: FragmentYourPostBinding
     private lateinit var jobType: String
-    private lateinit var jobPostModel: JobViewModel
+    private lateinit var jobPostModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
     private lateinit var bottomSheetDialog: BottomSheetDialog
     override fun onCreateView(
@@ -28,7 +27,7 @@ class YourPostFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentYourPostBinding.inflate(layoutInflater, container, false)
-        jobPostModel = ViewModelProvider(this)[JobViewModel::class.java]
+        jobPostModel = ViewModelProvider(this)[DbViewModel::class.java]
         binding.btnPostJob.setOnClickListener {
             bottomSheet()
         }

@@ -1,16 +1,17 @@
 package com.gyanhub.finde_job.repository
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.gyanhub.finde_job.model.Job
+import com.gyanhub.finde_job.model.User
 
-class JobRepository {
+class DbRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+
 
     suspend fun postJob(
         jobTitle: String,
@@ -58,25 +59,28 @@ class JobRepository {
             }
     }
 
-    suspend fun getAllJob(callback: (Boolean,List<Job>, String) -> Unit) {
+    suspend fun getAllJob(callback: (Boolean, List<Job>, String) -> Unit) {
         val jobLiveData = mutableListOf<Job>()
         firestore.collection("Job")
             .addSnapshotListener { jobs, error ->
                 if (error != null) {
-                    callback(false,jobLiveData, error.message ?: "Unknown error occurred")
+                    callback(false, jobLiveData, error.message ?: "Unknown error occurred")
                     return@addSnapshotListener
                 }
                 val job = mutableListOf<Job>()
-                for (j in jobs!!){
+                for (j in jobs!!) {
                     val jo = j.toObject(Job::class.java)
                     job.add(jo)
                 }
                 jobLiveData.addAll(job)
-                callback(true,jobLiveData,"")
+                callback(true, jobLiveData, "")
             }
     }
 
-    suspend fun getYourJob(documentIds:List<String>,callback: (Boolean,List<Job>, String) -> Unit){
+    suspend fun getYourJob(
+        documentIds: List<String>,
+        callback: (Boolean, List<Job>, String) -> Unit
+    ) {
         val jobLiveData = mutableListOf<Job>()
         firestore.collection("Job")
             .whereIn(FieldPath.documentId(), documentIds)
@@ -88,11 +92,23 @@ class JobRepository {
                     job.add(yourJobData)
                 }
                 jobLiveData.addAll(job)
-                callback(true,jobLiveData,"")
+                callback(true, jobLiveData, "")
             }
             .addOnFailureListener { exception ->
-                callback(false,jobLiveData,exception.message.toString())
+                callback(false, jobLiveData, exception.message.toString())
             }
+    }
+
+    suspend fun getUser(callback: (Boolean, User?, String) -> Unit) {
+
+        firestore.collection("users").document(auth.currentUser!!.uid)
+            .get().addOnSuccessListener {
+               val user = it.toObject<User>()
+                callback(true,user,"")
+            }.addOnFailureListener {
+                callback(false,null,"error ${it.message}")
+            }
+
     }
 
 }
