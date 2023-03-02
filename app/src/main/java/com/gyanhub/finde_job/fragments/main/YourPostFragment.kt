@@ -1,5 +1,6 @@
 package com.gyanhub.finde_job.fragments.main
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -22,6 +23,8 @@ class YourPostFragment : Fragment() {
     private lateinit var jobPostModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
     private lateinit var bottomSheetDialog: BottomSheetDialog
+    private lateinit var homeAdapter: HomeAdapter
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,21 +34,22 @@ class YourPostFragment : Fragment() {
         binding.btnPostJob.setOnClickListener {
             bottomSheet()
         }
-        jobPostModel.getYourJobs(listOf("5BMvsr9Hn6VQ67Roi7IJ")){success,erroe ->
-            if (success){
-                jobPostModel.yourJob.observe(viewLifecycleOwner){
-                    binding.rcYourPost.adapter = HomeAdapter(it)
-                    binding.textView.visibility = View.GONE
+        jobPostModel.listOfYourJob.observe(viewLifecycleOwner) {
+            homeAdapter.notifyDataSetChanged()
+            jobPostModel.getYourJobs(it) { success, erroe ->
+                if (success) {
+                    jobPostModel.yourJob.observe(viewLifecycleOwner) {
+                        homeAdapter = HomeAdapter(it)
+                        binding.rcYourPost.adapter = homeAdapter
+                        binding.textView.visibility = View.GONE
+                    }
+                } else {
+                    binding.textView.visibility = View.VISIBLE
+                    binding.textView.text = erroe
                 }
-            }else{
-                binding.textView.visibility = View.VISIBLE
-                binding.textView.text = erroe
+
             }
-
         }
-
-
-
 
         return binding.root
     }
