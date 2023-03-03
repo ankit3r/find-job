@@ -3,6 +3,7 @@ package com.gyanhub.finde_job.viewModle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.gyanhub.finde_job.fragments.LoginFragment
+import com.gyanhub.finde_job.model.User
 import com.gyanhub.finde_job.repository.AuthRepository
 
 class AuthViewModel : ViewModel() {
@@ -29,6 +30,10 @@ class AuthViewModel : ViewModel() {
 
     fun isLogin(): Boolean {
         return authRepository.isUserLoggedIn()
+    }
+
+    fun getUser(callback: (Boolean, User?, String) -> Unit){
+        authRepository.getUserData(callback)
     }
 
 }

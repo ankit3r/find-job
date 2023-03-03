@@ -6,7 +6,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.gyanhub.finde_job.model.Job
-import com.gyanhub.finde_job.model.User
 
 class DbRepository {
     private val firestore = FirebaseFirestore.getInstance()
@@ -79,7 +78,7 @@ class DbRepository {
 
     suspend fun getYourJob(
         documentIds: List<String>,
-        callback: (Boolean, List<Job>, String) -> Unit
+        callback: (Boolean, List<Job>?, String) -> Unit
     ) {
         val jobLiveData = mutableListOf<Job>()
         firestore.collection("Job")
@@ -87,28 +86,20 @@ class DbRepository {
             .get()
             .addOnSuccessListener { documents ->
                 val job = mutableListOf<Job>()
-                for (document in documents) {
-                    val yourJobData = document.toObject<Job>()
-                    job.add(yourJobData)
+                if (!documents.isEmpty) {
+                    for (document in documents) {
+                        job.add(document.toObject())
+                    }
+                    jobLiveData.addAll(job)
+                    callback(true, jobLiveData, "")
+                } else {
+                    callback(false, null, "No Posted Job")
                 }
-                jobLiveData.addAll(job)
-                callback(true, jobLiveData, "")
             }
             .addOnFailureListener { exception ->
                 callback(false, jobLiveData, exception.message.toString())
             }
     }
 
-    suspend fun getUser(callback: (Boolean, User?, String) -> Unit) {
-
-        firestore.collection("users").document(auth.currentUser!!.uid)
-            .get().addOnSuccessListener {
-               val user = it.toObject<User>()
-                callback(true,user,"")
-            }.addOnFailureListener {
-                callback(false,null,"error ${it.message}")
-            }
-
-    }
 
 }

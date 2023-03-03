@@ -1,7 +1,5 @@
 package com.gyanhub.finde_job.viewModle
 
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,9 +11,6 @@ import kotlinx.coroutines.launch
 
 class DbViewModel : ViewModel() {
     private val jobRepository = DbRepository()
-    private val yourYobList = MutableLiveData<List<String>>()
-    val listOfYourJob: LiveData<List<String>>
-        get() = yourYobList
     private val setUser = MutableLiveData<User>()
     val userData: LiveData<User>
         get() = setUser
@@ -48,56 +43,39 @@ class DbViewModel : ViewModel() {
         }
     }
 
-    var data = MutableLiveData<List<Job>>()
+    private var data = MutableLiveData<List<Job>>()
     val getJob: LiveData<List<Job>>
         get() = data
-
-
-    var data2 = MutableLiveData<List<Job>>()
+   private var data2 = MutableLiveData<List<Job>>()
     val yourJob: LiveData<List<Job>>
-        get() = data
+        get() = data2
 
-    fun getAllJob() {
+    private fun getAllJob() {
         viewModelScope.launch {
             jobRepository.getAllJob { b, liveData, s ->
-                if (!b) {
-                    return@getAllJob
+                if (b) {
+                    data.postValue(liveData)
                 }
-                data.postValue(liveData)
             }
         }
     }
 
-    fun getYourJobs(list: List<String>, collback: (Boolean, String) -> Unit) {
+    fun getYourJobs(list: List<String>?, collback: (Boolean, String) -> Unit) {
         viewModelScope.launch {
-            jobRepository.getYourJob(list) { b, liveData, s ->
-                if (!b) {
-                    collback(false, "error")
-                    return@getYourJob
+            if (!list.isNullOrEmpty()) {
+                jobRepository.getYourJob(list) { b, liveData, s ->
+                    if (b) {
+                        data2.postValue(liveData)
+                        collback(false, "Success")
+                    }
+                    collback(true, "error")
                 }
-                data2.postValue(liveData)
-                collback(true, "error")
             }
         }
     }
 
-    fun getUserData() {
-        viewModelScope.launch {
-            jobRepository.getUser { success, user, error ->
-                if (success) {
-                    Log.d("ANKIT", user.toString())
-                    setUser.postValue(user)
-                  yourYobList.postValue(user?.job)
-                } else {
-                    Log.e("ANKIT", error)
-                }
-
-            }
-        }
-    }
 
     init {
-        getUserData()
         getAllJob()
     }
 }

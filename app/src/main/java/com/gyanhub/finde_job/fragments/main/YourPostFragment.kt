@@ -1,6 +1,6 @@
 package com.gyanhub.finde_job.fragments.main
 
-import android.annotation.SuppressLint
+
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,43 +14,49 @@ import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
+import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 
 
 class YourPostFragment : Fragment() {
     private lateinit var binding: FragmentYourPostBinding
     private lateinit var jobType: String
-    private lateinit var jobPostModel: DbViewModel
+    private lateinit var dbModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
     private lateinit var bottomSheetDialog: BottomSheetDialog
-    private lateinit var homeAdapter: HomeAdapter
-    @SuppressLint("NotifyDataSetChanged")
+    private lateinit var authModel: AuthViewModel
+    private lateinit var list: List<String>
+    private var life = true
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        life = true
         binding = FragmentYourPostBinding.inflate(layoutInflater, container, false)
-        jobPostModel = ViewModelProvider(this)[DbViewModel::class.java]
+        dbModel = ViewModelProvider(this)[DbViewModel::class.java]
+        authModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        list = listOf()
+        authModel.getUser { success, user, error ->
+            if (success) {
+                dbModel.getYourJobs(user!!.job) { s, e ->
+                    if (s) {
+                        if (life) {
+                            dbModel.yourJob.observe(viewLifecycleOwner) {
+                                binding.rcYourPost.adapter = HomeAdapter(it)
+                                binding.textView.visibility = View.GONE
+                            }
+                        }
+                    } else {
+                        binding.textView.visibility = View.VISIBLE
+                        binding.textView.text = e
+                    }
+                }
+            }
+        }
         binding.btnPostJob.setOnClickListener {
             bottomSheet()
         }
-        jobPostModel.listOfYourJob.observe(viewLifecycleOwner) {
-            homeAdapter.notifyDataSetChanged()
-            jobPostModel.getYourJobs(it) { success, erroe ->
-                if (success) {
-                    jobPostModel.yourJob.observe(viewLifecycleOwner) {
-                        homeAdapter = HomeAdapter(it)
-                        binding.rcYourPost.adapter = homeAdapter
-                        binding.textView.visibility = View.GONE
-                    }
-                } else {
-                    binding.textView.visibility = View.VISIBLE
-                    binding.textView.text = erroe
-                }
-
-            }
-        }
-
         return binding.root
     }
 
@@ -79,7 +85,7 @@ class YourPostFragment : Fragment() {
             }
             // posting job in firebase
 
-            jobPostModel.postJob(
+            dbModel.postJob(
                 bottomBinding.eTxtTitle.text.toString(),
                 bottomBinding.eTxtCyName.text.toString(),
                 bottomBinding.eTxtTotalPost.text.toString(),
@@ -92,6 +98,7 @@ class YourPostFragment : Fragment() {
             ) { success, error ->
                 if (success) {
                     bottomSheetDialog.dismiss()
+
                 } else {
                     Log.d("ANKIT", "Error $error")
                 }
@@ -128,5 +135,8 @@ class YourPostFragment : Fragment() {
         return true
     }
 
-
+    override fun onDestroy() {
+        life = false
+        super.onDestroy()
+    }
 }
