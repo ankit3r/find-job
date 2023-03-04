@@ -58,6 +58,12 @@ class SignUpFragment : Fragment() {
         if (binding.eTxtPhNoUp.text.isEmpty()) {
             binding.eTxtPhNoUp.error = "Required"
             return
+        }else{
+            val isValid = isValidMobileNumber(binding.eTxtPhNoUp.text.toString())
+            if (!isValid) {
+                binding.eTxtPhNoUp.error = "Invalid Mobile No"
+                return
+            }
         }
         if (binding.eTxtEmailUp.text.isEmpty()) {
             binding.eTxtEmailUp.error = "Required"
@@ -107,5 +113,8 @@ class SignUpFragment : Fragment() {
         dialog = builder.create()
         dialog.show()
     }
-
+    fun isValidMobileNumber(mobileNumber: String): Boolean {
+        val regex = Regex("^[6-9]\\d{9}\$")
+        return regex.matches(mobileNumber)
+    }
 }

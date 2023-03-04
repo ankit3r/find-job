@@ -108,6 +108,13 @@ class YourPostFragment : Fragment() {
             if (!checkFiled(bottomBinding.eTxtSkill)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtWCA)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtWhNo)) return@setOnClickListener
+            else {
+                val isValid = isValidMobileNumber(bottomBinding.eTxtWhNo.text.toString())
+                if (!isValid) {
+                    bottomBinding.eTxtWhNo.error = "Invalid Mobile No"
+                    return@setOnClickListener
+                }
+            }
             //  converting skill into list
             dialog.show()
             val skillList = mutableListOf<String>()
@@ -144,7 +151,7 @@ class YourPostFragment : Fragment() {
         bottomSheetDialog.show()
     }
 
-    private fun dropdown(view: Spinner, list: List<String>,callback:(Boolean,String)->Unit) {
+    private fun dropdown(view: Spinner, list: List<String>, callback: (Boolean, String) -> Unit) {
         val adapter = CustomSpinner(requireActivity(), list)
         view.adapter = adapter
         view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -154,11 +161,11 @@ class YourPostFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                callback(true,list[position])
+                callback(true, list[position])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-               callback(false,"")
+                callback(false, "")
             }
         }
 
@@ -185,5 +192,10 @@ class YourPostFragment : Fragment() {
     override fun onDestroy() {
         life = false
         super.onDestroy()
+    }
+
+    fun isValidMobileNumber(mobileNumber: String): Boolean {
+        val regex = Regex("^[6-9]\\d{9}\$")
+        return regex.matches(mobileNumber)
     }
 }
