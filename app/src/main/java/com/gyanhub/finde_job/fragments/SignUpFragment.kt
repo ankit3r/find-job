@@ -1,5 +1,6 @@
 package com.gyanhub.finde_job.fragments
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.MainActivity
 import com.gyanhub.finde_job.databinding.FragmentSignUpBinding
 import com.gyanhub.finde_job.viewModle.AuthViewModel
@@ -21,6 +23,7 @@ class SignUpFragment : Fragment() {
     private lateinit var binding: FragmentSignUpBinding
     private lateinit var viewModel: AuthViewModel
     private lateinit var imm: InputMethodManager
+    private lateinit var dialog : AlertDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,7 +67,7 @@ class SignUpFragment : Fragment() {
             binding.eTxtPassUp.error = "Required"
             return
         }
-        binding.cardProgress.visibility = View.VISIBLE
+       progressBar()
         viewModel.registerUser(
             binding.eTxtEmailUp.text.toString(),
             binding.eTxtPassUp.text.toString(),
@@ -73,23 +76,13 @@ class SignUpFragment : Fragment() {
 
         ) { success, error ->
             if (success) {
-                binding.cardProgress.visibility = View.GONE
+                dialog.dismiss()
                 val intent = Intent(activity, MainActivity::class.java)
                 startActivity(intent)
                 requireActivity().finish()
             } else {
                 Toast.makeText(context, "error $error", Toast.LENGTH_SHORT).show()
-                binding.ProgressBar.visibility = View.GONE
-                binding.txtError.text = error
-                binding.txtError.visibility = View.VISIBLE
-                binding.btnCloseError.visibility = View.VISIBLE
-                binding.btnCloseError.setOnClickListener {
-                    binding.cardProgress.visibility = View.GONE
-                    binding.ProgressBar.visibility = View.GONE
-                    binding.txtError.visibility = View.GONE
-                    it.visibility = View.GONE
-                }
-
+                dialog.dismiss()
             }
         }
 
@@ -104,6 +97,15 @@ class SignUpFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
+    }
+    private fun progressBar(){
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        val view = inflater.inflate(R.layout.custome_progress_bar, null)
+        builder.setView(view)
+        builder.setCancelable(false)
+        dialog = builder.create()
+        dialog.show()
     }
 
 }

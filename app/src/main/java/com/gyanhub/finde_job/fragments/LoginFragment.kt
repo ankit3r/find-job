@@ -1,6 +1,7 @@
 package com.gyanhub.finde_job.fragments
 
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -23,6 +24,7 @@ class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
     private lateinit var viewModel: AuthViewModel
     private lateinit var imm: InputMethodManager
+    private lateinit var dialog: AlertDialog
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,30 +59,20 @@ class LoginFragment : Fragment() {
             binding.passwordToggle.error = "Required"
             return
         }
-        binding.cardProgress.visibility = View.VISIBLE
+        progressBar()
         viewModel.loginUser(
             binding.editTextTextEmailAddress.text.toString(),
             binding.passwordToggle.text.toString()
         ) { success, error ->
 
             if (success) {
-                binding.cardProgress.visibility = View.GONE
+                dialog.dismiss()
                 val intent = Intent(activity, MainActivity::class.java)
                 startActivity(intent)
                 requireActivity().finish()
             } else {
                 Toast.makeText(context, "error $error", Toast.LENGTH_SHORT).show()
-                binding.ProgressBar.visibility = View.GONE
-                binding.txtError.text = error
-                binding.txtError.visibility = View.VISIBLE
-                binding.btnCloseError.visibility = View.VISIBLE
-                binding.btnCloseError.setOnClickListener {
-                    binding.cardProgress.visibility = View.GONE
-                    binding.ProgressBar.visibility = View.GONE
-                    binding.txtError.visibility = View.GONE
-                    it.visibility = View.GONE
-                }
-
+                dialog.dismiss()
             }
 
         }
@@ -96,6 +88,16 @@ class LoginFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
+    }
+
+    private fun progressBar() {
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        val view = inflater.inflate(R.layout.custome_progress_bar, null)
+        builder.setView(view)
+        builder.setCancelable(false)
+        dialog = builder.create()
+        dialog.show()
     }
 
 

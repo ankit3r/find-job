@@ -12,8 +12,7 @@ class DbRepository {
     private val auth = FirebaseAuth.getInstance()
 
 
-    suspend fun postJob(
-        jobTitle: String,
+    suspend fun postJob(   jobTitle: String,
         jobCyName: String,
         jobPostOpportunitity: String,
         whNo: String,
@@ -22,8 +21,9 @@ class DbRepository {
         skils: List<String>,
         pay: String,
         jobType: String,
-        callback: (Boolean, String) -> Unit
-    ) {
+        state: String,
+        city: String,
+        callback: (Boolean, String) -> Unit) {
         val uid = firestore.collection("job").document().id
 
         val job = Job(
@@ -36,7 +36,9 @@ class DbRepository {
             whoCanApply,
             skils,
             pay,
-            jobType
+            jobType,
+            state,
+            city
         )
         firestore.collection("Job").document(uid)
             .set(job)

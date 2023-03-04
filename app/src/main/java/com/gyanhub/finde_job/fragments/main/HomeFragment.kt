@@ -1,5 +1,6 @@
 package com.gyanhub.finde_job.fragments.main
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
@@ -20,6 +21,7 @@ class HomeFragment() : Fragment() {
     private lateinit var filterLayout: RelativeLayout
     private lateinit var searchView: SearchView
     private lateinit var jobModel: DbViewModel
+    private lateinit var dialog : AlertDialog
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,11 +31,10 @@ class HomeFragment() : Fragment() {
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
         jobModel = ViewModelProvider(this)[DbViewModel::class.java]
 
-
-
-
+        progressBar()
         jobModel.getJob.observe(viewLifecycleOwner){
             binding.rcJob.adapter = HomeAdapter(it)
+            dialog.dismiss()
         }
 
         return binding.root
@@ -94,5 +95,16 @@ class HomeFragment() : Fragment() {
             }
         }
     }
+
+    private fun progressBar(){
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        val view = inflater.inflate(R.layout.custome_progress_bar, null)
+        builder.setView(view)
+        builder.setCancelable(false)
+        dialog = builder.create()
+        dialog.show()
+    }
+
 
 }

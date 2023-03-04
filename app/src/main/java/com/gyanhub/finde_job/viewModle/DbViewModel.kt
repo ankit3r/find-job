@@ -25,6 +25,8 @@ class DbViewModel : ViewModel() {
         skils: List<String>,
         pay: String,
         jobType: String,
+        state: String,
+        city: String,
         callback: (Boolean, String) -> Unit
     ) {
         viewModelScope.launch {
@@ -38,6 +40,8 @@ class DbViewModel : ViewModel() {
                 skils,
                 pay,
                 jobType,
+                state,
+                city,
                 callback
             )
         }
@@ -46,7 +50,7 @@ class DbViewModel : ViewModel() {
     private var data = MutableLiveData<List<Job>>()
     val getJob: LiveData<List<Job>>
         get() = data
-   private var data2 = MutableLiveData<List<Job>>()
+    private var data2 = MutableLiveData<List<Job>>()
     val yourJob: LiveData<List<Job>>
         get() = data2
 
@@ -73,7 +77,6 @@ class DbViewModel : ViewModel() {
             }
         }
     }
-
 
     init {
         getAllJob()

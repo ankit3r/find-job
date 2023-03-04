@@ -18,13 +18,14 @@
     <string name="enter_full_name">Enter Full Name</string>
     <string name="or_sign_up_with">- Or sign up with -</string>
     <string name="enter_origination_name">Enter Origination name</string>
-    <string name="pay_1000_2000">pay 1000 - 2000</string>
+    <string name="pay_1000_2000">Pay 1000 – 2000</string>
     <string name="enter_total_posts">Enter Total Posts</string>
     <string name="enter_job_description">Enter Job Description</string>
-    <string name="enter_skill">Enter tags (,) comma-separated</string>
+    <string name="enter_skill">Enter Skill (,) comma-separated</string>
     <string name="enter_whatsapp_no">Enter Whatsapp No</string>
     <string name="enter_who_can_apply">Enter Who Can Apply</string>
     <string name="job_title">Enter Job Title</string>
     <string name="post_job">Post Job</string>
-    <string name="post">post job</string>
+    <string name="post">Post Job</string>
+    <string name="enter_city_name">Enter City Name</string>
 </resources>

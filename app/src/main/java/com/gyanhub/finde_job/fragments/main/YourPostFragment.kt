@@ -1,6 +1,7 @@
 package com.gyanhub.finde_job.fragments.main
 
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,22 +11,28 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
+import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
+import com.gyanhub.finde_job.model.State
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 
 
 class YourPostFragment : Fragment() {
     private lateinit var binding: FragmentYourPostBinding
-    private lateinit var jobType: String
     private lateinit var dbModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
     private lateinit var bottomSheetDialog: BottomSheetDialog
     private lateinit var authModel: AuthViewModel
+    private lateinit var dialog: AlertDialog
     private lateinit var list: List<String>
+    private lateinit var jobType: String
+    private lateinit var state: String
     private var life = true
 
     override fun onCreateView(
@@ -37,6 +44,7 @@ class YourPostFragment : Fragment() {
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         authModel = ViewModelProvider(this)[AuthViewModel::class.java]
         list = listOf()
+        progressBar()
         authModel.getUser { success, user, error ->
             if (success) {
                 dbModel.getYourJobs(user!!.job) { s, e ->
@@ -45,15 +53,21 @@ class YourPostFragment : Fragment() {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
                                 binding.rcYourPost.adapter = HomeAdapter(it)
                                 binding.textView.visibility = View.GONE
+                                dialog.dismiss()
                             }
                         }
                     } else {
                         binding.textView.visibility = View.VISIBLE
                         binding.textView.text = e
+                        dialog.dismiss()
                     }
                 }
-            }
+            } else dialog.dismiss()
         }
+
+
+
+
         binding.btnPostJob.setOnClickListener {
             bottomSheet()
         }
@@ -62,15 +76,32 @@ class YourPostFragment : Fragment() {
 
     private fun bottomSheet() {
 
+        val spinnerItems = mutableListOf<State>()
+        val jsonString =
+            context?.assets?.open("States.json")?.bufferedReader().use { it?.readText() }
+
+        val itemType = object : TypeToken<List<State>>() {}.type
+        spinnerItems.addAll(Gson().fromJson(jsonString, itemType))
+
+
         bottomSheetDialog = BottomSheetDialog(requireActivity())
         bottomBinding = PostJobBottomBinding.inflate(layoutInflater)
         bottomSheetDialog.setContentView(bottomBinding.root)
-        dropdown(bottomBinding.type, listOf("Internship", "Job"))
-
+        dropdown(bottomBinding.type, listOf("Internship", "Job", "Part Time")) { success, data ->
+            if (success) {
+                jobType = data
+            }
+        }
+        dropdown(bottomBinding.dState, spinnerItems.map { it.name }) { success, data ->
+            if (success) {
+                state = data
+            }
+        }
 
         bottomBinding.btnPostJob.setOnClickListener {
             if (!checkFiled(bottomBinding.eTxtTitle)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtCyName)) return@setOnClickListener
+            if (!checkFiled(bottomBinding.eTxtxCity)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtPay)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtTotalPost)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtDisc)) return@setOnClickListener
@@ -78,6 +109,7 @@ class YourPostFragment : Fragment() {
             if (!checkFiled(bottomBinding.eTxtWCA)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtWhNo)) return@setOnClickListener
             //  converting skill into list
+            dialog.show()
             val skillList = mutableListOf<String>()
             val tags = bottomBinding.eTxtSkill.text.toString().split(Regex("\\s*,\\s*"))
             for (tag in tags) {
@@ -94,13 +126,17 @@ class YourPostFragment : Fragment() {
                 bottomBinding.eTxtWCA.text.toString(),
                 skillList,
                 bottomBinding.eTxtPay.text.toString(),
-                jobType
+                jobType,
+                jobType,
+                bottomBinding.eTxtxCity.text.toString()
             ) { success, error ->
                 if (success) {
                     bottomSheetDialog.dismiss()
+                    dialog.dismiss()
 
                 } else {
                     Log.d("ANKIT", "Error $error")
+                    dialog.dismiss()
                 }
 
             }
@@ -108,7 +144,7 @@ class YourPostFragment : Fragment() {
         bottomSheetDialog.show()
     }
 
-    private fun dropdown(view: Spinner, list: List<String>) {
+    private fun dropdown(view: Spinner, list: List<String>,callback:(Boolean,String)->Unit) {
         val adapter = CustomSpinner(requireActivity(), list)
         view.adapter = adapter
         view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -118,13 +154,14 @@ class YourPostFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                jobType = list[position]
+                callback(true,list[position])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                // do nothing
+               callback(false,"")
             }
         }
+
     }
 
     private fun checkFiled(view: EditText): Boolean {
@@ -133,6 +170,16 @@ class YourPostFragment : Fragment() {
             return false
         }
         return true
+    }
+
+    private fun progressBar() {
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        val view = inflater.inflate(R.layout.custome_progress_bar, null)
+        builder.setView(view)
+        builder.setCancelable(false)
+        dialog = builder.create()
+        dialog.show()
     }
 
     override fun onDestroy() {
