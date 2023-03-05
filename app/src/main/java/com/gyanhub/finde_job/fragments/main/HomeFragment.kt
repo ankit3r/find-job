@@ -1,5 +1,6 @@
 package com.gyanhub.finde_job.fragments.main
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
@@ -8,20 +9,33 @@ import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.databinding.FragmentHomeBinding
+import com.gyanhub.finde_job.model.State
 import com.gyanhub.finde_job.viewModle.DbViewModel
+import com.gyanhub.finde_job.viewModle.MainViewModel
 
 class HomeFragment() : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var filterLayout: RelativeLayout
+    private lateinit var filter: CardView
+    private lateinit var filter1: Spinner
+    private lateinit var filter2: Spinner
+    private lateinit var filter3: Spinner
     private lateinit var searchView: SearchView
     private lateinit var jobModel: DbViewModel
-    private lateinit var dialog : AlertDialog
+    private lateinit var mainModel: MainViewModel
+    private lateinit var adapter: HomeAdapter
+    private lateinit var dialog: AlertDialog
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,15 +43,174 @@ class HomeFragment() : Fragment() {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         setHasOptionsMenu(true)
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
+        filter = requireActivity().findViewById(R.id.fllterBtn)
+        filter1 = requireActivity().findViewById(R.id.btnFilter1)
+        filter2 = requireActivity().findViewById(R.id.btnFilter2)
+        filter3 = requireActivity().findViewById(R.id.btnFilter3)
         jobModel = ViewModelProvider(this)[DbViewModel::class.java]
-
-
+        mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         progressBar()
-        jobModel.getJob.observe(viewLifecycleOwner){
-            binding.rcJob.adapter = HomeAdapter(it)
+        jobModel.getJob.observe(viewLifecycleOwner) {
+            adapter = HomeAdapter(it)
+            binding.rcJob.adapter = adapter
             dialog.dismiss()
         }
+        setUpDropDownFilter()
+        filter.setOnClickListener {
+            val payField = "filterPay"
+            val stateField = "state"
+            val typeField = "jobType"
+            dialog.show()
+            if (mainModel.filterByJobType != "All"
+                && mainModel.filterByPay != "All"
+                && mainModel.filterByState != "All"
+            ) {
+                massage("All Filed Filter")
+                jobModel.multiplFieldFilter(
+                    mainModel.filterByPay.toInt(),
+                    mainModel.filterByState,
+                    mainModel.filterByJobType
+                ) { success, data, error ->
+                    if (success) {
+                        jobModel.data.postValue(data)
+                        Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                }
+            }
+            else if (
+                mainModel.filterByJobType != "All"
+                && mainModel.filterByPay == "All"
+                && mainModel.filterByState != "All"
+            ) {
+                massage("job type or state")
+                jobModel.multiplFieldFilter(
+                    0,
+                    mainModel.filterByState,
+                    mainModel.filterByJobType
+                ) { success, data, error ->
+                    if (success) {
+                        jobModel.data.postValue(data)
+                        Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                }
+            }
+            else if (
+                mainModel.filterByJobType == "All"
+                && mainModel.filterByPay != "All"
+                && mainModel.filterByState != "All"
+            ) {
+                massage("pay or state")
+                jobModel.doubleValueFilter(
+                    mainModel.filterByPay.toInt(),
+                    mainModel.filterByState,
+                    stateField
+                ) { success, data, error ->
+                    if (success) {
+                        jobModel.data.postValue(data)
+                        Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                }
+            }
+            else if (
+                mainModel.filterByState == "All"
+                && mainModel.filterByPay != "All"
+                && mainModel.filterByJobType != "All"
+            ) {
+                massage("pay or job type")
+                jobModel.doubleValueFilter(
+                    mainModel.filterByPay.toInt(),
+                    mainModel.filterByJobType,
+                    typeField
 
+                ) { success, data, error ->
+                    if (success) {
+                        jobModel.data.postValue(data)
+                        Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                }
+            }
+            else if (
+                mainModel.filterByJobType == "All"
+                && mainModel.filterByPay == "All"
+                && mainModel.filterByState == "All"
+            ) {
+                massage("no filter")
+                jobModel.getAllJob()
+                adapter.notifyDataSetChanged()
+                dialog.dismiss()
+            }
+            else if (mainModel.filterByJobType != "All") {
+                massage("job type")
+                jobModel.singlFieldFilter(
+                    typeField,
+                    mainModel.filterByJobType
+                ) { success, data, error ->
+                    if (success) {
+                        jobModel.data.postValue(data)
+                        Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                }
+            }
+            else if (mainModel.filterByPay != "All") {
+                massage("Pay")
+                jobModel.filterPay(
+                    payField,
+                    mainModel.filterByPay.toInt()
+                ) { success, data, error ->
+                    if (success) {
+                        jobModel.data.postValue(data)
+                        Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                }
+            }
+            else if (this.mainModel.filterByState != "All") {
+                massage("state")
+                jobModel.singlFieldFilter(
+                    stateField,
+                    mainModel.filterByState
+                ) { success, data, error ->
+                    if (success) {
+                        jobModel.data.postValue(data)
+                        Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                }
+            }
+        }
         return binding.root
     }
 
@@ -77,27 +250,7 @@ class HomeFragment() : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun dropdown(view: Spinner, list: List<String>) {
-        val adapter = CustomSpinner(requireActivity(), list)
-        view.adapter = adapter
-        view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                Toast.makeText(context, list[position], Toast.LENGTH_SHORT).show()
-
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // do nothing
-            }
-        }
-    }
-
-    private fun progressBar(){
+    private fun progressBar() {
         val builder = AlertDialog.Builder(context)
         val inflater = layoutInflater
         val view = inflater.inflate(R.layout.custome_progress_bar, null)
@@ -107,5 +260,69 @@ class HomeFragment() : Fragment() {
         dialog.show()
     }
 
+    private fun setUpDropDownFilter() {
+        val spinnerItems = mutableListOf<State>()
+        spinnerItems.add(0, State("a", "All"))
+        val jsonString =
+            context?.assets?.open("States.json")?.bufferedReader().use { it?.readText() }
+        val itemType = object : TypeToken<List<State>>() {}.type
+        spinnerItems.addAll(Gson().fromJson(jsonString, itemType))
+        dropdown(
+            filter1,
+            listOf("All", "Internship", "Job", "Part Time")
+        ) { success, data ->
+            if (success) {
+                mainModel.filterByJobType = data
+            }
+
+        }
+        dropdown(
+            filter2,
+            listOf("All", "5000", "10000", "15000", "20000")
+        ) { success, data ->
+            if (success) {
+                mainModel.filterByPay = data
+            }
+
+        }
+        dropdown(
+            filter3,
+            spinnerItems.map { it.name }
+        ) { success, data ->
+            if (success) {
+                mainModel.filterByState = data
+            }
+
+        }
+    }
+
+    private fun dropdown(view: Spinner, list: List<String>, callback: (Boolean, String) -> Unit) {
+        val adapter = CustomSpinner(requireActivity(), list)
+        view.adapter = adapter
+        view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                callback(true, list[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                callback(false, "")
+            }
+        }
+
+    }
+
+    private fun massage(massage:String){
+        Toast.makeText(context, massage, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+         filterLayout.visibility = View.GONE
+        super.onDestroy()
+    }
 
 }

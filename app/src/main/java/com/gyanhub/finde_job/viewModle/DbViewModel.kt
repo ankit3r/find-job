@@ -10,7 +10,7 @@ import com.gyanhub.finde_job.repository.DbRepository
 import kotlinx.coroutines.launch
 
 class DbViewModel : ViewModel() {
-    private val jobRepository = DbRepository()
+     private val jobRepository = DbRepository()
     private val setUser = MutableLiveData<User>()
     val userData: LiveData<User>
         get() = setUser
@@ -49,14 +49,14 @@ class DbViewModel : ViewModel() {
         }
     }
 
-    private var data = MutableLiveData<List<Job>>()
+     var data = MutableLiveData<List<Job>>()
     val getJob: LiveData<List<Job>>
         get() = data
     private var data2 = MutableLiveData<List<Job>>()
     val yourJob: LiveData<List<Job>>
         get() = data2
 
-    private fun getAllJob() {
+     fun getAllJob() {
         viewModelScope.launch {
             jobRepository.getAllJob { b, liveData, s ->
                 if (b) {
@@ -78,6 +78,40 @@ class DbViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun singlFieldFilter(
+        fieldName: String,
+        value: String,
+        callback: (Boolean, List<Job>, String) -> Unit
+    ){
+        jobRepository.filterBySingleFiled(fieldName,value,callback)
+    }
+    fun filterPay(
+        fieldName: String,
+        value: Int,
+        callback: (Boolean, List<Job>, String) -> Unit
+    ){
+        jobRepository.filterByPay(fieldName,value,callback)
+    }
+
+
+    fun multiplFieldFilter(
+        pay: Int,
+        location: String,
+        type: String,
+        callback: (Boolean, List<Job>, String) -> Unit
+    ){
+        jobRepository.filterByMultiple(pay,location,type,callback)
+    }
+
+    fun doubleValueFilter(
+        pay: Int,
+        value: String,
+        filedName: String,
+        callback: (Boolean, List<Job>, String) -> Unit
+    ){
+        jobRepository.filterByMultiple(pay,value,filedName,callback)
     }
 
     init {

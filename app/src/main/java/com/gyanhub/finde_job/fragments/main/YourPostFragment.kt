@@ -47,6 +47,18 @@ class YourPostFragment : Fragment() {
         progressBar()
         authModel.getUser { success, user, error ->
             if (success) {
+                if (user?.job.isNullOrEmpty()){
+                    dialog.dismiss()
+                }else{
+                    if (life) {
+                        dbModel.yourJob.observe(viewLifecycleOwner) {
+                            binding.rcYourPost.adapter = HomeAdapter(it)
+                            binding.textView.visibility = View.GONE
+                            dialog.dismiss()
+
+                        }
+                    }
+                }
                 dbModel.getYourJobs(user!!.job) { s, e ->
                     if (s) {
                         if (life) {
@@ -54,6 +66,7 @@ class YourPostFragment : Fragment() {
                                 binding.rcYourPost.adapter = HomeAdapter(it)
                                 binding.textView.visibility = View.GONE
                                 dialog.dismiss()
+
                             }
                         }
                     } else {
