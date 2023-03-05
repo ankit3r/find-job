@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:backgroundTint="@color/purple_200"
     style="@style/cardStyle">
    <RelativeLayout
        android:layout_width="match_parent"
@@ -13,21 +12,24 @@
            android:id="@+id/cardTextTitle"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           style="@style/menuTextStyle"
+           style="@style/textStyle_20sp_bold"
            android:text="@string/app_name"/>
        <TextView
+           style="@style/textStyle_18sp"
            android:id="@+id/cardTxtCyName"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/app_name"
            android:layout_below="@id/cardTextTitle"/>
        <TextView
+           style="@style/textStyle_18sp"
            android:id="@+id/cardTxtJobType"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/app_name"
            android:layout_below="@id/cardTxtCyName"/>
        <TextView
+           style="@style/textStyle_18sp"
            android:id="@+id/cardTxtPay"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
