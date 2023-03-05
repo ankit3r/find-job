@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.holder.ViewJobFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/txtJobTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="1dp"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:text="job type"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtJobType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtJobTitle"
+                android:layout_marginEnd="1dp"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:text="job type"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtCyName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtJobType"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="1dp"
+                android:maxLines="3"
+                android:padding="5dp"
+                android:text="Cy Name"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/txtlocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtCyName"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="1dp"
+                android:maxLines="3"
+                android:padding="5dp"
+                android:text="Cy Name"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtPay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtlocation"
+                android:drawablePadding="1dp"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:text="12000-15000/month"
+                android:textSize="16sp" />
+
+
+            <View
+                android:id="@+id/v1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_below="@id/txtPay"
+                android:layout_marginTop="1dp"
+                android:background="@android:color/darker_gray"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="About the work from home job"
+                android:id="@+id/txtAbout"
+                android:layout_below="@id/v1"
+                android:layout_marginTop="5dp"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/txtJobDis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtAbout"
+                android:layout_marginTop="5dp"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+
+            <TextView
+                android:id="@+id/txtOpportunities"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtJobDis"
+                android:textSize="16sp" />
+
+            <View
+                android:id="@+id/v2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_below="@id/txtOpportunities"
+                android:layout_marginTop="1dp" />
+
+            <TextView
+                android:id="@+id/txtSkillTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/v2"
+                android:layout_marginTop="5dp"
+                android:text="Skill(s) required"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtSkill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtSkillTitle"
+                android:textSize="16sp" />
+
+            <View
+                android:id="@+id/v3"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_below="@id/txtSkill"
+                android:layout_marginTop="1dp"
+                android:background="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/txtWhoTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/v3"
+                android:layout_marginTop="5dp"
+                android:text="Who Can Apply"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtWhoCanApply"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtWhoTitle"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtWhoCanApply"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="15dp"
+                android:text="Apply Now" />
+
+
+        </RelativeLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

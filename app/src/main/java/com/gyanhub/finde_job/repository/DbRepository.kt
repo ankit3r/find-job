@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import com.gyanhub.finde_job.model.Job
+import com.gyanhub.finde_job.model.User
 
 class DbRepository {
     private val firestore = FirebaseFirestore.getInstance()
@@ -208,5 +209,18 @@ class DbRepository {
             }
     }
 
+    fun getJobById(id:String,callBack:(Boolean,Job?,String) -> Unit){
+        jobCollection.document(id)
+            .get().addOnSuccessListener { document ->
+                if (document != null) {
+                    callBack(true, document.toObject<Job>(), "")
+                } else {
+                    callBack(false, null, "No Such Document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                callBack(false, null, exception.message.toString())
+            }
+    }
 
 }

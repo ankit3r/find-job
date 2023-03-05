@@ -16,6 +16,7 @@ import com.google.gson.Gson
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
+import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
 import com.gyanhub.finde_job.model.State
@@ -23,7 +24,7 @@ import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 
 
-class YourPostFragment : Fragment() {
+class YourPostFragment : Fragment() ,HomeInterface{
     private lateinit var binding: FragmentYourPostBinding
     private lateinit var dbModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
@@ -52,7 +53,7 @@ class YourPostFragment : Fragment() {
                 }else{
                     if (life) {
                         dbModel.yourJob.observe(viewLifecycleOwner) {
-                            binding.rcYourPost.adapter = HomeAdapter(it)
+                            binding.rcYourPost.adapter = HomeAdapter(it,this)
                             binding.textView.visibility = View.GONE
                             dialog.dismiss()
 
@@ -63,7 +64,7 @@ class YourPostFragment : Fragment() {
                     if (s) {
                         if (life) {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
-                                binding.rcYourPost.adapter = HomeAdapter(it)
+                                binding.rcYourPost.adapter = HomeAdapter(it,this)
                                 binding.textView.visibility = View.GONE
                                 dialog.dismiss()
 
@@ -212,5 +213,9 @@ class YourPostFragment : Fragment() {
     fun isValidMobileNumber(mobileNumber: String): Boolean {
         val regex = Regex("^[6-9]\\d{9}\$")
         return regex.matches(mobileNumber)
+    }
+
+    override fun onClick(id: String) {
+        Toast.makeText(context, "click item", Toast.LENGTH_SHORT).show()
     }
 }

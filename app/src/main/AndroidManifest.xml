@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Finde_job"
         tools:targetApi="31">
         <activity
+            android:name=".activity.HolderActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.FragmentHolderActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">

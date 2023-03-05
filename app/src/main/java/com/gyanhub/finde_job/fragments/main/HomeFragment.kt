@@ -2,6 +2,7 @@ package com.gyanhub.finde_job.fragments.main
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
@@ -15,14 +16,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.gyanhub.finde_job.R
+import com.gyanhub.finde_job.activity.HolderActivity
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
+import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.databinding.FragmentHomeBinding
 import com.gyanhub.finde_job.model.State
 import com.gyanhub.finde_job.viewModle.DbViewModel
 import com.gyanhub.finde_job.viewModle.MainViewModel
 
-class HomeFragment() : Fragment() {
+class HomeFragment() : Fragment(),HomeInterface {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var filterLayout: RelativeLayout
     private lateinit var filter: CardView
@@ -51,7 +54,7 @@ class HomeFragment() : Fragment() {
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         progressBar()
         jobModel.getJob.observe(viewLifecycleOwner) {
-            adapter = HomeAdapter(it)
+            adapter = HomeAdapter(it,this)
             binding.rcJob.adapter = adapter
             dialog.dismiss()
         }
@@ -323,6 +326,13 @@ class HomeFragment() : Fragment() {
     override fun onDestroy() {
          filterLayout.visibility = View.GONE
         super.onDestroy()
+    }
+
+    override fun onClick(id: String) {
+        val intent = Intent(context,HolderActivity::class.java)
+        intent.putExtra("f",0)
+        intent.putExtra("id",id)
+        requireActivity().startActivity(intent)
     }
 
 }

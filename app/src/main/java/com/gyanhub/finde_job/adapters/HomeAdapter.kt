@@ -6,9 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gyanhub.finde_job.R
+import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.model.Job
 
-class HomeAdapter(private val list: List<Job>) :
+class HomeAdapter(private val list: List<Job>,private val onClick:HomeInterface) :
     RecyclerView.Adapter<HomeAdapter.HomeViewHolder>() {
     inner class HomeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title :TextView = view.findViewById(R.id.cardTextTitle)
@@ -29,6 +30,9 @@ class HomeAdapter(private val list: List<Job>) :
         holder.cy.text = job.jobCyName
         holder.type.text = job.jobType
         holder.pay.text = job.pay
+        holder.itemView.setOnClickListener {
+            onClick.onClick(job.jobId)
+        }
     }
 
     override fun getItemCount(): Int {
