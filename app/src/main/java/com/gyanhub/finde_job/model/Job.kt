@@ -10,9 +10,10 @@ data class Job(
     val whoCanApply : String,
     val skils: List<String>,
     val pay : String,
+    val filterPay : Int,
     val jobType:String,
     val state:String,
     val city:String
 ){
-    constructor() : this("", "", "","","","","",listOf(),"","","","")
+    constructor() : this("", "", "","","","","",listOf(),"",0,"","","")
 }

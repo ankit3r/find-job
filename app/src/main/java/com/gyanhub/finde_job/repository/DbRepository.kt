@@ -20,6 +20,7 @@ class DbRepository {
         whoCanApply: String,
         skils: List<String>,
         pay: String,
+        filterPay: Int,
         jobType: String,
         state: String,
         city: String,
@@ -36,6 +37,7 @@ class DbRepository {
             whoCanApply,
             skils,
             pay,
+            filterPay,
             jobType,
             state,
             city

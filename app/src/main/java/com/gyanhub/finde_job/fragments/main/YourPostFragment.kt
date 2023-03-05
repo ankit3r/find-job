@@ -122,6 +122,7 @@ class YourPostFragment : Fragment() {
             for (tag in tags) {
                 skillList.add(tag)
             }
+            val firstNumber = bottomBinding.eTxtPay.text.toString().substringBefore("-")
             // posting job in firebase
 
             dbModel.postJob(
@@ -133,8 +134,9 @@ class YourPostFragment : Fragment() {
                 bottomBinding.eTxtWCA.text.toString(),
                 skillList,
                 bottomBinding.eTxtPay.text.toString(),
+                firstNumber.toInt(),
                 jobType,
-                jobType,
+                state,
                 bottomBinding.eTxtxCity.text.toString()
             ) { success, error ->
                 if (success) {

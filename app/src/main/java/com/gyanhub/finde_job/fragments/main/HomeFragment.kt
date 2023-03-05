@@ -31,6 +31,7 @@ class HomeFragment() : Fragment() {
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
         jobModel = ViewModelProvider(this)[DbViewModel::class.java]
 
+
         progressBar()
         jobModel.getJob.observe(viewLifecycleOwner){
             binding.rcJob.adapter = HomeAdapter(it)
