@@ -111,7 +111,7 @@ class DbViewModel : ViewModel() {
         filedName: String,
         callback: (Boolean, List<Job>, String) -> Unit
     ){
-        jobRepository.filterByMultiple(pay,value,filedName,callback)
+        jobRepository.filterByDoubleValue(pay,value,filedName,callback)
     }
 
     fun getJobById(id:String,callback: (Boolean, Job?, String) -> Unit){

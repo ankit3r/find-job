@@ -203,7 +203,9 @@ class DbRepository {
                     for (doc in snapshot) {
                         val job = doc.toObject(Job::class.java)
                         jobLiveData.add(job)
+                        Log.d("ANKIT", job.toString())
                     }
+                    Log.d("ANKIT", jobLiveData.size.toString())
                     callback(true, jobLiveData, "")
                 }
             }

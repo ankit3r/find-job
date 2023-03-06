@@ -53,7 +53,8 @@ class YourPostFragment : Fragment() ,HomeInterface{
                 }else{
                     if (life) {
                         dbModel.yourJob.observe(viewLifecycleOwner) {
-                            binding.rcYourPost.adapter = HomeAdapter(it,this)
+                            val dapter =  HomeAdapter(it,this)
+                            binding.rcYourPost.adapter = dapter
                             binding.textView.visibility = View.GONE
                             dialog.dismiss()
 
@@ -64,7 +65,8 @@ class YourPostFragment : Fragment() ,HomeInterface{
                     if (s) {
                         if (life) {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
-                                binding.rcYourPost.adapter = HomeAdapter(it,this)
+                                val dapter =  HomeAdapter(it,this)
+                                binding.rcYourPost.adapter = dapter
                                 binding.textView.visibility = View.GONE
                                 dialog.dismiss()
 

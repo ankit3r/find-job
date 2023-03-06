@@ -1,10 +1,12 @@
 package com.gyanhub.finde_job.fragments.main
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.RelativeLayout
 import android.widget.Spinner
@@ -21,6 +23,7 @@ import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.databinding.FragmentHomeBinding
+import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.State
 import com.gyanhub.finde_job.viewModle.DbViewModel
 import com.gyanhub.finde_job.viewModle.MainViewModel
@@ -37,6 +40,7 @@ class HomeFragment() : Fragment(),HomeInterface {
     private lateinit var mainModel: MainViewModel
     private lateinit var adapter: HomeAdapter
     private lateinit var dialog: AlertDialog
+    private lateinit var list: List<Job>
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
@@ -45,6 +49,8 @@ class HomeFragment() : Fragment(),HomeInterface {
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         setHasOptionsMenu(true)
+        list = listOf()
+
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
         filter = requireActivity().findViewById(R.id.fllterBtn)
         filter1 = requireActivity().findViewById(R.id.btnFilter1)
@@ -54,10 +60,12 @@ class HomeFragment() : Fragment(),HomeInterface {
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         progressBar()
         jobModel.getJob.observe(viewLifecycleOwner) {
-            adapter = HomeAdapter(it,this)
+            list = it
+            adapter = HomeAdapter(list,this)
             binding.rcJob.adapter = adapter
             dialog.dismiss()
         }
+        adapter = HomeAdapter(list,this)
         setUpDropDownFilter()
         filter.setOnClickListener {
             val payField = "filterPay"
@@ -225,13 +233,19 @@ class HomeFragment() : Fragment(),HomeInterface {
         searchView.queryHint = resources.getString(R.string.hintSearchMess)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Toast.makeText(context, "enter: $query", Toast.LENGTH_SHORT).show()
-                return true
+                adapter.filter.filter(query)
+                hideKeyboard()
+                searchView.clearFocus()
+                return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 Toast.makeText(context, "enter: $newText", Toast.LENGTH_SHORT).show()
+                adapter.filter.filter(newText)
+
                 return false
             }
 
@@ -281,7 +295,7 @@ class HomeFragment() : Fragment(),HomeInterface {
         }
         dropdown(
             filter2,
-            listOf("All", "5000", "10000", "15000", "20000")
+            listOf("All", "5000", "10000", "15000", "20000","2500","30000","35000","40000","45000","50000")
         ) { success, data ->
             if (success) {
                 mainModel.filterByPay = data
@@ -333,6 +347,11 @@ class HomeFragment() : Fragment(),HomeInterface {
         intent.putExtra("f",0)
         intent.putExtra("id",id)
         requireActivity().startActivity(intent)
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
 }
