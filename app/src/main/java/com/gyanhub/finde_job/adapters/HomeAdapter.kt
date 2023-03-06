@@ -17,9 +17,6 @@ class HomeAdapter(private val jobList: List<Job>,private val onClick:HomeInterfa
 
     private var filteredList = jobList.toMutableList()
 
-
-
-
     inner class HomeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title :TextView = view.findViewById(R.id.cardTextTitle)
         val cy :TextView = view.findViewById(R.id.cardTxtCyName)

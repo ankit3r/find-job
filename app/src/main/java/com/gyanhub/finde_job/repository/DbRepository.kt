@@ -15,7 +15,6 @@ class DbRepository {
     private val auth = FirebaseAuth.getInstance()
     private var jobCollection = firestore.collection("Job")
 
-
     suspend fun postJob(
         jobTitle: String,
         jobCyName: String,
@@ -46,7 +45,8 @@ class DbRepository {
             filterPay,
             jobType,
             state,
-            city
+            city,
+            0
         )
         jobCollection.document(uid)
             .set(job)
@@ -157,7 +157,6 @@ class DbRepository {
             }
     }
 
-    // method for filtering data with multiple filters
     fun filterByMultiple(
         pay: Int,
         location: String,
@@ -211,7 +210,7 @@ class DbRepository {
             }
     }
 
-    fun getJobById(id:String,callBack:(Boolean,Job?,String) -> Unit){
+    fun getJobById(id: String, callBack: (Boolean, Job?, String) -> Unit) {
         jobCollection.document(id)
             .get().addOnSuccessListener { document ->
                 if (document != null) {
@@ -225,4 +224,42 @@ class DbRepository {
             }
     }
 
+    fun deleteYourJob(id: String, callBack: (Boolean, String) -> Unit) {
+        jobCollection.document(id).delete()
+            .addOnSuccessListener {
+                firestore.collection("users").document(auth.currentUser!!.uid)
+                    .update("job", FieldValue.arrayRemove(id))
+                    .addOnSuccessListener {
+                       callBack(true,"")
+                    }
+                    .addOnFailureListener { exception ->
+                      callBack(false,exception.message.toString())
+                    }
+
+            }
+            .addOnFailureListener { e ->
+                Log.e("ANKIT", e.message.toString())
+            }
+    }
+
+    fun appliedJob(id:String,callback: (Boolean, String) -> Unit){
+        jobCollection.document(id)
+            .update("totalApplied", FieldValue.increment(1))
+            .addOnSuccessListener {
+                firestore.collection("users").document(auth.currentUser!!.uid)
+                    .update(
+                        "youApply", FieldValue.arrayUnion(id)
+                    ).addOnSuccessListener {
+                        callback(true, "")
+                    }
+                    .addOnFailureListener { e ->
+                        callback(false, e.message ?: "Unknown error occurred")
+                    }
+
+            }
+            .addOnFailureListener { e ->
+                callback(false, e.message ?: "Not applied")
+              Log.e("ANKIT",e.message.toString())
+            }
+    }
 }

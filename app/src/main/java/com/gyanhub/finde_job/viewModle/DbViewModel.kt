@@ -118,6 +118,14 @@ class DbViewModel : ViewModel() {
         jobRepository.getJobById(id,callback)
     }
 
+    fun deleteJob(id:String,  callback: (Boolean, String) -> Unit){
+        jobRepository.deleteYourJob(id,callback)
+    }
+
+    fun appliedJob(id:String,  callback: (Boolean, String) -> Unit){
+        jobRepository.appliedJob(id,callback)
+    }
+
     init {
         getAllJob()
     }

@@ -24,7 +24,7 @@ import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 
 
-class YourPostFragment : Fragment() ,HomeInterface{
+class YourPostFragment : Fragment(), HomeInterface {
     private lateinit var binding: FragmentYourPostBinding
     private lateinit var dbModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
@@ -45,15 +45,16 @@ class YourPostFragment : Fragment() ,HomeInterface{
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         authModel = ViewModelProvider(this)[AuthViewModel::class.java]
         list = listOf()
+
         progressBar()
         authModel.getUser { success, user, error ->
             if (success) {
-                if (user?.job.isNullOrEmpty()){
+                if (user?.job.isNullOrEmpty()) {
                     dialog.dismiss()
-                }else{
+                } else {
                     if (life) {
                         dbModel.yourJob.observe(viewLifecycleOwner) {
-                            val dapter =  HomeAdapter(it,this)
+                            val dapter = HomeAdapter(it, this)
                             binding.rcYourPost.adapter = dapter
                             binding.textView.visibility = View.GONE
                             dialog.dismiss()
@@ -65,7 +66,7 @@ class YourPostFragment : Fragment() ,HomeInterface{
                     if (s) {
                         if (life) {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
-                                val dapter =  HomeAdapter(it,this)
+                                val dapter = HomeAdapter(it, this)
                                 binding.rcYourPost.adapter = dapter
                                 binding.textView.visibility = View.GONE
                                 dialog.dismiss()
@@ -218,6 +219,40 @@ class YourPostFragment : Fragment() ,HomeInterface{
     }
 
     override fun onClick(id: String) {
-        Toast.makeText(context, "click item", Toast.LENGTH_SHORT).show()
+        itemClickOption()
+    }
+
+    private fun itemClickOption(){
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Item View")
+        builder.setMessage("What do you want? View Or Delete Item")
+        builder.setCancelable(false)
+        builder.setPositiveButton("View") { dialog, which ->
+            Toast.makeText(context, "Go next Activity", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+
+        builder.setNegativeButton("Delete") { dialog, which ->
+            deleteItemOption()
+            dialog.dismiss()
+        }
+        builder.create().show()
+    }
+    private fun deleteItemOption(){
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Delete Item")
+        builder.setMessage("Are you sure you want to delete this item?")
+        builder.setCancelable(false)
+        builder.setPositiveButton("Yes") { dialogs, which ->
+            Toast.makeText(context, "item deleted", Toast.LENGTH_SHORT).show()
+            dialogs.dismiss()
+        }
+
+        builder.setNegativeButton("No") { dialogs, which ->
+           dialogs.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
     }
 }
