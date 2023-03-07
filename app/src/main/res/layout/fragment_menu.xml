@@ -9,69 +9,87 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnLogout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <androidx.cardview.widget.CardView
+            style="@style/cardStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:orientation="vertical">
+            android:layout_gravity="center"
+            android:minWidth="250dp"
+            android:minHeight="350dp">
 
-            <ImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/profile_circle" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/txtUserName"
-                style="@style/menuTextStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:text="User Name"
-                android:textAlignment="center" />
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/profile_circle" />
 
-            <TextView
-                android:id="@+id/txtUserPhNo"
-                style="@style/menuTextStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="0213654793"
-                android:textAlignment="center" />
+                <TextView
+                    android:id="@+id/txtUserName"
+                    style="@style/menuTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:maxLines="1"
+                    android:text="User Name"
+                    android:textAlignment="center" />
 
-            <TextView
-                android:id="@+id/txtUserEmail"
-                style="@style/menuTextStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="abc@gmail.com"
-                android:textAlignment="center" />
+                <TextView
+                    android:id="@+id/txtUserPhNo"
+                    style="@style/menuTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="0213654793"
+                    android:textAlignment="center" />
 
-            <TextView
-                android:id="@+id/txtUserResume"
-                style="@style/menuTextStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Resume"
-                android:textAlignment="center" />
+                <TextView
+                    android:id="@+id/txtUserEmail"
+                    style="@style/menuTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="abc@gmail.com"
+                    android:textAlignment="center" />
 
+                <TextView
+                    android:id="@+id/txtUserResume"
+                    style="@style/menuTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:layout_marginTop="20dp"
+                    android:text="View Resume"
+                    android:textAlignment="center" />
 
-            <Button
-                android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="2dp"
-                android:backgroundTint="@color/white"
-                android:text="Log out"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/black" />
-        </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </ScrollView>
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="@android:color/darker_gray"
+        android:text="Log out"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

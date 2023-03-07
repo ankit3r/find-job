@@ -2,13 +2,18 @@ package com.gyanhub.finde_job.viewModle
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.gyanhub.finde_job.fragments.LoginFragment
 import com.gyanhub.finde_job.model.User
 import com.gyanhub.finde_job.repository.AuthRepository
+import java.util.*
 
 class AuthViewModel : ViewModel() {
     var fragment: Fragment = LoginFragment()
     private val authRepository = AuthRepository()
+
 
     fun registerUser(
         email: String,
@@ -35,5 +40,7 @@ class AuthViewModel : ViewModel() {
     fun getUser(callback: (Boolean, User?, String) -> Unit){
         authRepository.getUserData(callback)
     }
+
+
 
 }

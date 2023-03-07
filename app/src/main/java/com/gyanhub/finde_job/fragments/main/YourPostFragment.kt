@@ -2,6 +2,7 @@ package com.gyanhub.finde_job.fragments.main
 
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,11 +15,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.gyanhub.finde_job.R
+import com.gyanhub.finde_job.activity.HolderActivity
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
+import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.State
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
@@ -30,11 +33,12 @@ class YourPostFragment : Fragment(), HomeInterface {
     private lateinit var bottomBinding: PostJobBottomBinding
     private lateinit var bottomSheetDialog: BottomSheetDialog
     private lateinit var authModel: AuthViewModel
-    private lateinit var dialog: AlertDialog
+    private lateinit var progressBar: AlertDialog
     private lateinit var list: List<String>
     private lateinit var jobType: String
     private lateinit var state: String
     private var life = true
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,46 +48,34 @@ class YourPostFragment : Fragment(), HomeInterface {
         binding = FragmentYourPostBinding.inflate(layoutInflater, container, false)
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         authModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        progressBar()
         list = listOf()
 
-        progressBar()
+        dbModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
+            if (visible) progressBar.show() else progressBar.dismiss()
+        }
+        dbModel.showProgressBar()
         authModel.getUser { success, user, error ->
-            if (success) {
-                if (user?.job.isNullOrEmpty()) {
-                    dialog.dismiss()
-                } else {
-                    if (life) {
-                        dbModel.yourJob.observe(viewLifecycleOwner) {
-                            val dapter = HomeAdapter(it, this)
-                            binding.rcYourPost.adapter = dapter
-                            binding.textView.visibility = View.GONE
-                            dialog.dismiss()
-
-                        }
-                    }
-                }
+            if (success && !user?.job.isNullOrEmpty()) {
                 dbModel.getYourJobs(user!!.job) { s, e ->
                     if (s) {
                         if (life) {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
-                                val dapter = HomeAdapter(it, this)
+                                val dapter = HomeAdapter(requireContext(),it, this)
                                 binding.rcYourPost.adapter = dapter
                                 binding.textView.visibility = View.GONE
-                                dialog.dismiss()
+                                dbModel.hideProgressBar()
 
                             }
                         }
                     } else {
                         binding.textView.visibility = View.VISIBLE
                         binding.textView.text = e
-                        dialog.dismiss()
+                        dbModel.hideProgressBar()
                     }
                 }
-            } else dialog.dismiss()
+            } else  dbModel.hideProgressBar()
         }
-
-
-
 
         binding.btnPostJob.setOnClickListener {
             bottomSheet()
@@ -133,7 +125,7 @@ class YourPostFragment : Fragment(), HomeInterface {
                 }
             }
             //  converting skill into list
-            dialog.show()
+            dbModel.showProgressBar()
             val skillList = mutableListOf<String>()
             val tags = bottomBinding.eTxtSkill.text.toString().split(Regex("\\s*,\\s*"))
             for (tag in tags) {
@@ -158,11 +150,11 @@ class YourPostFragment : Fragment(), HomeInterface {
             ) { success, error ->
                 if (success) {
                     bottomSheetDialog.dismiss()
-                    dialog.dismiss()
+                    dbModel.hideProgressBar()
 
                 } else {
                     Log.d("ANKIT", "Error $error")
-                    dialog.dismiss()
+                    dbModel.hideProgressBar()
                 }
 
             }
@@ -204,8 +196,8 @@ class YourPostFragment : Fragment(), HomeInterface {
         val view = inflater.inflate(R.layout.custome_progress_bar, null)
         builder.setView(view)
         builder.setCancelable(false)
-        dialog = builder.create()
-        dialog.show()
+        progressBar = builder.create()
+
     }
 
     override fun onDestroy() {
@@ -219,40 +211,61 @@ class YourPostFragment : Fragment(), HomeInterface {
     }
 
     override fun onClick(id: String) {
-        itemClickOption()
+        itemClickOption(id)
     }
 
-    private fun itemClickOption(){
+    private fun itemClickOption(id: String) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Item View")
         builder.setMessage("What do you want? View Or Delete Item")
         builder.setCancelable(false)
         builder.setPositiveButton("View") { dialog, which ->
-            Toast.makeText(context, "Go next Activity", Toast.LENGTH_SHORT).show()
+            val intent = Intent(context, HolderActivity::class.java)
+            intent.putExtra("f", 0)
+            intent.putExtra("id", id)
+            requireActivity().startActivity(intent)
             dialog.dismiss()
         }
 
 
-        builder.setNegativeButton("Delete") { dialog, which ->
-            deleteItemOption()
+
+        builder.setNegativeButton("Delete") { dialog, _ ->
+            deleteItemOption(id)
+            dialog.dismiss()
+        }
+
+        builder.setNeutralButton("Cancel") { dialog, _ ->
             dialog.dismiss()
         }
         builder.create().show()
     }
-    private fun deleteItemOption(){
+
+    private fun deleteItemOption(id: String) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Delete Item")
         builder.setMessage("Are you sure you want to delete this item?")
         builder.setCancelable(false)
         builder.setPositiveButton("Yes") { dialogs, which ->
-            Toast.makeText(context, "item deleted", Toast.LENGTH_SHORT).show()
+            dbModel.showProgressBar()
+            dbModel.deleteJob(id) { success, error ->
+                if (success) {
+                    dbModel.hideProgressBar()
+                    Toast.makeText(context, "Item delete ", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Item deleting failed", Toast.LENGTH_SHORT).show()
+                    dbModel.hideProgressBar()
+                }
+
+            }
             dialogs.dismiss()
         }
 
         builder.setNegativeButton("No") { dialogs, which ->
-           dialogs.dismiss()
+            dialogs.dismiss()
         }
         val dialog = builder.create()
         dialog.show()
     }
+
+
 }

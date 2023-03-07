@@ -10,6 +10,26 @@ import com.gyanhub.finde_job.repository.DbRepository
 import kotlinx.coroutines.launch
 
 class DbViewModel : ViewModel() {
+
+    private val _progressBarVisible = MutableLiveData<Boolean>()
+    val progressBarVisible: LiveData<Boolean> = _progressBarVisible
+
+    val listOfPay = listOf("All", "5000", "10000", "15000", "20000","25000","30000","35000","40000","45000","50000")
+val listOfJobType =  listOf("All", "Internship", "Job", "Part Time")
+    val payField = "filterPay"
+    val stateField = "state"
+    val typeField = "jobType"
+    fun showProgressBar() {
+        _progressBarVisible.postValue(true)
+    }
+
+    fun hideProgressBar() {
+        _progressBarVisible.postValue(false)
+    }
+
+
+
+
      private val jobRepository = DbRepository()
     private val setUser = MutableLiveData<User>()
     val userData: LiveData<User>

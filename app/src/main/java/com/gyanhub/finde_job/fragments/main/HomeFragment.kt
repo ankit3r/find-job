@@ -3,6 +3,7 @@ package com.gyanhub.finde_job.fragments.main
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -39,7 +40,7 @@ class HomeFragment() : Fragment(),HomeInterface {
     private lateinit var jobModel: DbViewModel
     private lateinit var mainModel: MainViewModel
     private lateinit var adapter: HomeAdapter
-    private lateinit var dialog: AlertDialog
+    private lateinit var progressBar: AlertDialog
     private lateinit var list: List<Job>
 
     @SuppressLint("NotifyDataSetChanged")
@@ -59,19 +60,20 @@ class HomeFragment() : Fragment(),HomeInterface {
         jobModel = ViewModelProvider(this)[DbViewModel::class.java]
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         progressBar()
+        jobModel.showProgressBar()
+        jobModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
+                if (visible) progressBar.show() else progressBar.dismiss()
+        }
         jobModel.getJob.observe(viewLifecycleOwner) {
             list = it
-            adapter = HomeAdapter(list,this)
+            adapter = HomeAdapter(requireContext(),list,this)
             binding.rcJob.adapter = adapter
-            dialog.dismiss()
+            jobModel.hideProgressBar()
         }
-        adapter = HomeAdapter(list,this)
+        adapter = HomeAdapter(requireContext(),list,this)
         setUpDropDownFilter()
         filter.setOnClickListener {
-            val payField = "filterPay"
-            val stateField = "state"
-            val typeField = "jobType"
-            dialog.show()
+           jobModel.showProgressBar()
             if (mainModel.filterByJobType != "All"
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByState != "All"
@@ -86,10 +88,10 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                        dialog.dismiss()
+                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                        jobModel.hideProgressBar()
                     }
                 }
             }
@@ -108,10 +110,10 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                        dialog.dismiss()
+                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                        jobModel.hideProgressBar()
                     }
                 }
             }
@@ -124,16 +126,16 @@ class HomeFragment() : Fragment(),HomeInterface {
                 jobModel.doubleValueFilter(
                     mainModel.filterByPay.toInt(),
                     mainModel.filterByState,
-                    stateField
+                    jobModel.stateField
                 ) { success, data, error ->
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     }
                 }
             }
@@ -146,17 +148,17 @@ class HomeFragment() : Fragment(),HomeInterface {
                 jobModel.doubleValueFilter(
                     mainModel.filterByPay.toInt(),
                     mainModel.filterByJobType,
-                    typeField
+                    jobModel.typeField
 
                 ) { success, data, error ->
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     }
                 }
             }
@@ -168,56 +170,56 @@ class HomeFragment() : Fragment(),HomeInterface {
                 massage("no filter")
                 jobModel.getAllJob()
                 adapter.notifyDataSetChanged()
-                dialog.dismiss()
+                 jobModel.hideProgressBar()
             }
             else if (mainModel.filterByJobType != "All") {
                 massage("job type")
                 jobModel.singlFieldFilter(
-                    typeField,
+                    jobModel.typeField,
                     mainModel.filterByJobType
                 ) { success, data, error ->
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     }
                 }
             }
             else if (mainModel.filterByPay != "All") {
                 massage("Pay")
                 jobModel.filterPay(
-                    payField,
+                    jobModel.payField,
                     mainModel.filterByPay.toInt()
                 ) { success, data, error ->
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     }
                 }
             }
             else if (this.mainModel.filterByState != "All") {
                 massage("state")
                 jobModel.singlFieldFilter(
-                    stateField,
+                    jobModel.stateField,
                     mainModel.filterByState
                 ) { success, data, error ->
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                         jobModel.hideProgressBar()
                     }
                 }
             }
@@ -273,8 +275,8 @@ class HomeFragment() : Fragment(),HomeInterface {
         val view = inflater.inflate(R.layout.custome_progress_bar, null)
         builder.setView(view)
         builder.setCancelable(false)
-        dialog = builder.create()
-        dialog.show()
+        progressBar = builder.create()
+       
     }
 
     private fun setUpDropDownFilter() {
@@ -284,28 +286,20 @@ class HomeFragment() : Fragment(),HomeInterface {
             context?.assets?.open("States.json")?.bufferedReader().use { it?.readText() }
         val itemType = object : TypeToken<List<State>>() {}.type
         spinnerItems.addAll(Gson().fromJson(jsonString, itemType))
-        dropdown(
-            filter1,
-            listOf("All", "Internship", "Job", "Part Time")
-        ) { success, data ->
+
+
+        dropdown(filter1, jobModel.listOfPay) { success, data ->
             if (success) {
                 mainModel.filterByJobType = data
             }
-
         }
-        dropdown(
-            filter2,
-            listOf("All", "5000", "10000", "15000", "20000","2500","30000","35000","40000","45000","50000")
-        ) { success, data ->
+        dropdown(filter2, jobModel.listOfPay) { success, data ->
             if (success) {
                 mainModel.filterByPay = data
             }
 
         }
-        dropdown(
-            filter3,
-            spinnerItems.map { it.name }
-        ) { success, data ->
+        dropdown(filter3, spinnerItems.map { it.name }) { success, data ->
             if (success) {
                 mainModel.filterByState = data
             }

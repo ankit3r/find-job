@@ -1,5 +1,7 @@
 package com.gyanhub.finde_job.adapters
 
+import android.content.Context
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,12 +9,14 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.model.Job
 import java.util.*
+import java.util.concurrent.TimeUnit
 
-class HomeAdapter(private val jobList: List<Job>,private val onClick:HomeInterface) :
+class HomeAdapter(private val context: Context, private val jobList: List<Job>, private val onClick:HomeInterface) :
     RecyclerView.Adapter<HomeAdapter.HomeViewHolder>(),Filterable {
 
     private var filteredList = jobList.toMutableList()
@@ -35,7 +39,7 @@ class HomeAdapter(private val jobList: List<Job>,private val onClick:HomeInterfa
         holder.title.text = job.jobTitle
         holder.cy.text = job.jobCyName
         holder.type.text = job.jobType
-        holder.pay.text = job.pay
+        holder.pay.text = postDate(job.timestamp)
         holder.itemView.setOnClickListener {
             onClick.onClick(job.jobId)
         }
@@ -64,4 +68,21 @@ class HomeAdapter(private val jobList: List<Job>,private val onClick:HomeInterfa
             }
         }
     }
+
+    private fun postDate(time:Timestamp):String{
+        val timestamp: Timestamp = time
+        val postDate = timestamp.toDate()
+        val currentDate = Date()
+
+        val daysDiff = TimeUnit.DAYS.convert(currentDate.time - postDate.time, TimeUnit.MILLISECONDS)
+
+        val dateString = when (daysDiff) {
+            0L -> "today"
+            1L -> "yesterday"
+            else -> DateUtils.formatDateTime(context, postDate.time, DateUtils.FORMAT_SHOW_DATE)
+        }
+
+       return "Posted $dateString"
+    }
+
 }

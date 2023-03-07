@@ -1,6 +1,7 @@
 package com.gyanhub.finde_job.repository
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
@@ -46,7 +47,8 @@ class DbRepository {
             jobType,
             state,
             city,
-            0
+            0,
+            Timestamp.now()
         )
         jobCollection.document(uid)
             .set(job)
@@ -71,6 +73,7 @@ class DbRepository {
     suspend fun getAllJob(callback: (Boolean, List<Job>, String) -> Unit) {
         val jobLiveData = mutableListOf<Job>()
         jobCollection
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { jobs, error ->
                 if (error != null) {
                     callback(false, jobLiveData, error.message ?: "Unknown error occurred")
@@ -117,7 +120,9 @@ class DbRepository {
         callback: (Boolean, List<Job>, String) -> Unit
     ) {
         val jobLiveData = mutableListOf<Job>()
-        jobCollection.whereEqualTo(fieldName, value)
+        jobCollection
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .whereEqualTo(fieldName, value)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.d("ANKIT", "Error getting filtered jobs: $error")
@@ -140,7 +145,9 @@ class DbRepository {
         callback: (Boolean, List<Job>, String) -> Unit
     ) {
         val jobLiveData = mutableListOf<Job>()
-        jobCollection.whereGreaterThanOrEqualTo(fieldName, value)
+        jobCollection
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .whereGreaterThanOrEqualTo(fieldName, value)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.d("ANKIT", "Error getting filtered jobs: $error")
@@ -164,7 +171,9 @@ class DbRepository {
         callback: (Boolean, List<Job>, String) -> Unit
     ) {
         val jobLiveData = mutableListOf<Job>()
-        jobCollection.whereGreaterThanOrEqualTo("filterPay", pay)
+        jobCollection
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .whereGreaterThanOrEqualTo("filterPay", pay)
             .whereEqualTo("state", location)
             .whereEqualTo("jobType", type)
             .addSnapshotListener { snapshot, error ->
@@ -190,7 +199,9 @@ class DbRepository {
         callback: (Boolean, List<Job>, String) -> Unit
     ) {
         val jobLiveData = mutableListOf<Job>()
-        jobCollection.whereGreaterThanOrEqualTo("filterPay", pay)
+        jobCollection
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .whereGreaterThanOrEqualTo("filterPay", pay)
             .whereEqualTo(filedName, value)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {

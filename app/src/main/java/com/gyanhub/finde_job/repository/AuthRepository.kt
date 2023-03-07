@@ -4,11 +4,14 @@ package com.gyanhub.finde_job.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.storage.FirebaseStorage
 import com.gyanhub.finde_job.model.User
+import java.util.*
 
 class AuthRepository {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+    val storage = FirebaseStorage.getInstance()
 
 
     fun registerUser(
@@ -75,6 +78,23 @@ class AuthRepository {
             }
 
 
+    }
+    fun uploadResume(){
+        val storageRef = storage.reference
+        val filename = UUID.randomUUID().toString()
+        val resumeRef = storageRef.child("resumes/$filename.pdf")
+        resumeRef.downloadUrl.addOnSuccessListener { uri ->
+            val downloadUrl = uri.toString()
+            // Save the download URL to the user's database record
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                val userId = user.uid
+                val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+                userRef.update("resume", downloadUrl)
+            }
+        }.addOnFailureListener { exception ->
+            // Handle errors
+        }
     }
 
 }
