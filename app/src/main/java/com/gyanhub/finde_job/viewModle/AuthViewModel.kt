@@ -1,5 +1,6 @@
 package com.gyanhub.finde_job.viewModle
 
+import android.net.Uri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -41,6 +42,8 @@ class AuthViewModel : ViewModel() {
         authRepository.getUserData(callback)
     }
 
-
+    fun uploadResume(fileUri: Uri, callback: (Boolean, String,String) -> Unit){
+        authRepository.uploadResume(fileUri,callback)
+    }
 
 }

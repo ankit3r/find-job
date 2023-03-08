@@ -28,4 +28,6 @@
     <string name="post_job">Post Job</string>
     <string name="post">Post Job</string>
     <string name="enter_city_name">Enter City Name</string>
+    <string name="upload_resume">Upload Resume</string>
+    <string name="download_resume">Download Resume</string>
 </resources>

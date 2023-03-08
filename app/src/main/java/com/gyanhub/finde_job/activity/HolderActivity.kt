@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.databinding.ActivityHolderBinding
 import com.gyanhub.finde_job.fragments.holder.ViewJobFragment
-import com.gyanhub.finde_job.fragments.holder.ViewResumeFragment
 
 class HolderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHolderBinding
@@ -22,7 +21,6 @@ class HolderActivity : AppCompatActivity() {
         Toast.makeText(this, "id = $jobId", Toast.LENGTH_SHORT).show()
         when(position){
             0 -> setFragment(ViewJobFragment(jobId))
-            1 -> setFragment(ViewResumeFragment())
         }
     }
 
