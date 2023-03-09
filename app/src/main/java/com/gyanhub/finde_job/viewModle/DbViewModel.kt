@@ -13,9 +13,22 @@ class DbViewModel : ViewModel() {
 
     private val _progressBarVisible = MutableLiveData<Boolean>()
     val progressBarVisible: LiveData<Boolean> = _progressBarVisible
+    var life = true
 
-    val listOfPay = listOf("All", "5000", "10000", "15000", "20000","25000","30000","35000","40000","45000","50000")
-val listOfJobType =  listOf("All", "Internship", "Job", "Part Time")
+    val listOfPay = listOf(
+        "All",
+        "5000",
+        "10000",
+        "15000",
+        "20000",
+        "25000",
+        "30000",
+        "35000",
+        "40000",
+        "45000",
+        "50000"
+    )
+    val listOfJobType = listOf("All", "Internship", "Job", "Part Time")
     val payField = "filterPay"
     val stateField = "state"
     val typeField = "jobType"
@@ -28,9 +41,7 @@ val listOfJobType =  listOf("All", "Internship", "Job", "Part Time")
     }
 
 
-
-
-     private val jobRepository = DbRepository()
+    private val jobRepository = DbRepository()
     private val setUser = MutableLiveData<User>()
     val userData: LiveData<User>
         get() = setUser
@@ -69,14 +80,14 @@ val listOfJobType =  listOf("All", "Internship", "Job", "Part Time")
         }
     }
 
-     var data = MutableLiveData<List<Job>>()
+    var data = MutableLiveData<List<Job>>()
     val getJob: LiveData<List<Job>>
         get() = data
     private var data2 = MutableLiveData<List<Job>>()
     val yourJob: LiveData<List<Job>>
         get() = data2
 
-     fun getAllJob() {
+    fun getAllJob() {
         viewModelScope.launch {
             jobRepository.getAllJob { b, liveData, s ->
                 if (b) {
@@ -104,15 +115,16 @@ val listOfJobType =  listOf("All", "Internship", "Job", "Part Time")
         fieldName: String,
         value: String,
         callback: (Boolean, List<Job>, String) -> Unit
-    ){
-        jobRepository.filterBySingleFiled(fieldName,value,callback)
+    ) {
+        jobRepository.filterBySingleFiled(fieldName, value, callback)
     }
+
     fun filterPay(
         fieldName: String,
         value: Int,
         callback: (Boolean, List<Job>, String) -> Unit
-    ){
-        jobRepository.filterByPay(fieldName,value,callback)
+    ) {
+        jobRepository.filterByPay(fieldName, value, callback)
     }
 
 
@@ -121,8 +133,8 @@ val listOfJobType =  listOf("All", "Internship", "Job", "Part Time")
         location: String,
         type: String,
         callback: (Boolean, List<Job>, String) -> Unit
-    ){
-        jobRepository.filterByMultiple(pay,location,type,callback)
+    ) {
+        jobRepository.filterByMultiple(pay, location, type, callback)
     }
 
     fun doubleValueFilter(
@@ -130,20 +142,20 @@ val listOfJobType =  listOf("All", "Internship", "Job", "Part Time")
         value: String,
         filedName: String,
         callback: (Boolean, List<Job>, String) -> Unit
-    ){
-        jobRepository.filterByDoubleValue(pay,value,filedName,callback)
+    ) {
+        jobRepository.filterByDoubleValue(pay, value, filedName, callback)
     }
 
-    fun getJobById(id:String,callback: (Boolean, Job?, String) -> Unit){
-        jobRepository.getJobById(id,callback)
+    fun getJobById(id: String, callback: (Boolean, Job?, String) -> Unit) {
+        jobRepository.getJobById(id, callback)
     }
 
-    fun deleteJob(id:String,  callback: (Boolean, String) -> Unit){
-        jobRepository.deleteYourJob(id,callback)
+    fun deleteJob(id: String, callback: (Boolean, String) -> Unit) {
+        jobRepository.deleteYourJob(id, callback)
     }
 
-    fun appliedJob(id:String,  callback: (Boolean, String) -> Unit){
-        jobRepository.appliedJob(id,callback)
+    fun appliedJob(id: String, callback: (Boolean, String) -> Unit) {
+        jobRepository.appliedJob(id, callback)
     }
 
     init {

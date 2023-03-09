@@ -3,4 +3,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"/>
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/applied"
+        android:layout_centerHorizontal="true"
+        style="@style/textStyle_20sp_bold"/>
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="We need send your profile data to organization HR"
+        android:layout_below="@id/textV"
+        style="@style/textStyle_16sp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:layout_below="@id/text"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

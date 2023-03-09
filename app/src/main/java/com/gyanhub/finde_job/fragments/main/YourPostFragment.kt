@@ -61,7 +61,7 @@ class YourPostFragment : Fragment(), HomeInterface {
                     if (s) {
                         if (life) {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
-                                val dapter = HomeAdapter(requireContext(),it, this)
+                                val dapter = HomeAdapter(requireContext(),it, user.job,this)
                                 binding.rcYourPost.adapter = dapter
                                 binding.textView.visibility = View.GONE
                                 dbModel.hideProgressBar()

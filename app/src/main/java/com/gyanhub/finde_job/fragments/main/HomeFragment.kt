@@ -26,10 +26,11 @@ import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.databinding.FragmentHomeBinding
 import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.State
+import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 import com.gyanhub.finde_job.viewModle.MainViewModel
 
-class HomeFragment() : Fragment(),HomeInterface {
+class HomeFragment() : Fragment(), HomeInterface {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var filterLayout: RelativeLayout
     private lateinit var filter: CardView
@@ -39,9 +40,12 @@ class HomeFragment() : Fragment(),HomeInterface {
     private lateinit var searchView: SearchView
     private lateinit var jobModel: DbViewModel
     private lateinit var mainModel: MainViewModel
+    private lateinit var authModel: AuthViewModel
     private lateinit var adapter: HomeAdapter
     private lateinit var progressBar: AlertDialog
     private lateinit var list: List<Job>
+    private lateinit var yourJoblist: List<String>
+
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
@@ -51,6 +55,7 @@ class HomeFragment() : Fragment(),HomeInterface {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         setHasOptionsMenu(true)
         list = listOf()
+        yourJoblist = listOf()
 
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
         filter = requireActivity().findViewById(R.id.fllterBtn)
@@ -59,21 +64,32 @@ class HomeFragment() : Fragment(),HomeInterface {
         filter3 = requireActivity().findViewById(R.id.btnFilter3)
         jobModel = ViewModelProvider(this)[DbViewModel::class.java]
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
+        authModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
         progressBar()
         jobModel.showProgressBar()
-        jobModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
+        if (jobModel.life) {
+            jobModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
                 if (visible) progressBar.show() else progressBar.dismiss()
+            }
+            authModel.getUser { b, user, s ->
+                if (b && user != null) {
+                    yourJoblist = user.job
+                   if (jobModel.life){
+                       jobModel.getJob.observe(viewLifecycleOwner) {
+                           list = it
+                           adapter = HomeAdapter(requireContext(), list, user.job, this)
+                           binding.rcJob.adapter = adapter
+                           jobModel.hideProgressBar()
+                       }
+                   }
+                }
+            }
         }
-        jobModel.getJob.observe(viewLifecycleOwner) {
-            list = it
-            adapter = HomeAdapter(requireContext(),list,this)
-            binding.rcJob.adapter = adapter
-            jobModel.hideProgressBar()
-        }
-        adapter = HomeAdapter(requireContext(),list,this)
+
+        adapter = HomeAdapter(requireContext(), list, yourJoblist, this)
         setUpDropDownFilter()
         filter.setOnClickListener {
-           jobModel.showProgressBar()
+            jobModel.showProgressBar()
             if (mainModel.filterByJobType != "All"
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByState != "All"
@@ -94,8 +110,7 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.hideProgressBar()
                     }
                 }
-            }
-            else if (
+            } else if (
                 mainModel.filterByJobType != "All"
                 && mainModel.filterByPay == "All"
                 && mainModel.filterByState != "All"
@@ -116,8 +131,7 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.hideProgressBar()
                     }
                 }
-            }
-            else if (
+            } else if (
                 mainModel.filterByJobType == "All"
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByState != "All"
@@ -132,14 +146,13 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     }
                 }
-            }
-            else if (
+            } else if (
                 mainModel.filterByState == "All"
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByJobType != "All"
@@ -155,14 +168,13 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     }
                 }
-            }
-            else if (
+            } else if (
                 mainModel.filterByJobType == "All"
                 && mainModel.filterByPay == "All"
                 && mainModel.filterByState == "All"
@@ -170,9 +182,8 @@ class HomeFragment() : Fragment(),HomeInterface {
                 massage("no filter")
                 jobModel.getAllJob()
                 adapter.notifyDataSetChanged()
-                 jobModel.hideProgressBar()
-            }
-            else if (mainModel.filterByJobType != "All") {
+                jobModel.hideProgressBar()
+            } else if (mainModel.filterByJobType != "All") {
                 massage("job type")
                 jobModel.singlFieldFilter(
                     jobModel.typeField,
@@ -182,14 +193,13 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     }
                 }
-            }
-            else if (mainModel.filterByPay != "All") {
+            } else if (mainModel.filterByPay != "All") {
                 massage("Pay")
                 jobModel.filterPay(
                     jobModel.payField,
@@ -199,14 +209,13 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     }
                 }
-            }
-            else if (this.mainModel.filterByState != "All") {
+            } else if (this.mainModel.filterByState != "All") {
                 massage("state")
                 jobModel.singlFieldFilter(
                     jobModel.stateField,
@@ -216,10 +225,10 @@ class HomeFragment() : Fragment(),HomeInterface {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
                         adapter.notifyDataSetChanged()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                         jobModel.hideProgressBar()
+                        jobModel.hideProgressBar()
                     }
                 }
             }
@@ -276,7 +285,7 @@ class HomeFragment() : Fragment(),HomeInterface {
         builder.setView(view)
         builder.setCancelable(false)
         progressBar = builder.create()
-       
+
     }
 
     private fun setUpDropDownFilter() {
@@ -327,25 +336,84 @@ class HomeFragment() : Fragment(),HomeInterface {
 
     }
 
-    private fun massage(massage:String){
+    private fun massage(massage: String) {
         Toast.makeText(context, massage, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {
-         filterLayout.visibility = View.GONE
+        filterLayout.visibility = View.GONE
+        jobModel.life = false
         super.onDestroy()
     }
 
     override fun onClick(id: String) {
-        val intent = Intent(context,HolderActivity::class.java)
-        intent.putExtra("f",0)
-        intent.putExtra("id",id)
-        requireActivity().startActivity(intent)
+        if (id in yourJoblist) {
+            itemClickOption(id)
+        } else {
+            val intent = Intent(context, HolderActivity::class.java)
+            intent.putExtra("f", 0)
+            intent.putExtra("id", id)
+            requireActivity().startActivity(intent)
+        }
     }
 
     private fun hideKeyboard() {
-        val imm = requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
+    }
+
+    private fun itemClickOption(id: String) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("This Job Posted By You")
+        builder.setMessage("What do you want? View Or Delete Job")
+        builder.setCancelable(false)
+        builder.setPositiveButton("View") { dialog, which ->
+            val intent = Intent(context, HolderActivity::class.java)
+            intent.putExtra("f", 0)
+            intent.putExtra("id", id)
+            requireActivity().startActivity(intent)
+            dialog.dismiss()
+        }
+
+
+
+        builder.setNegativeButton("Delete") { dialog, _ ->
+            deleteItemOption(id)
+            dialog.dismiss()
+        }
+
+        builder.setNeutralButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
+    }
+
+    private fun deleteItemOption(id: String) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Delete Job")
+        builder.setMessage("Are you sure you want to delete this Job?")
+        builder.setCancelable(false)
+        builder.setPositiveButton("Yes") { dialogs, which ->
+            jobModel.showProgressBar()
+            jobModel.deleteJob(id) { success, error ->
+                if (success) {
+                    jobModel.hideProgressBar()
+                    Toast.makeText(context, "Item delete ", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Item deleting failed", Toast.LENGTH_SHORT).show()
+                    jobModel.hideProgressBar()
+                }
+
+            }
+            dialogs.dismiss()
+        }
+
+        builder.setNegativeButton("No") { dialogs, which ->
+            dialogs.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
     }
 
 }

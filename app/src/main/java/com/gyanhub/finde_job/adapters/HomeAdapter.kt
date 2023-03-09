@@ -1,6 +1,8 @@
 package com.gyanhub.finde_job.adapters
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -16,10 +18,11 @@ import com.gyanhub.finde_job.model.Job
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class HomeAdapter(private val context: Context, private val jobList: List<Job>, private val onClick:HomeInterface) :
+class HomeAdapter(private val context: Context, private val jobList: List<Job>, private val yourJobList: List<String>, private val onClick:HomeInterface) :
     RecyclerView.Adapter<HomeAdapter.HomeViewHolder>(),Filterable {
 
     private var filteredList = jobList.toMutableList()
+
 
     inner class HomeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title :TextView = view.findViewById(R.id.cardTextTitle)
@@ -36,6 +39,9 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
 
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
         val job = filteredList[position]
+        if(job.jobId in yourJobList){
+            holder.itemView.background = ColorDrawable(R.drawable.ic_launcher_background)
+        }
         holder.title.text = job.jobTitle
         holder.cy.text = job.jobCyName
         holder.type.text = job.jobType
@@ -84,5 +90,7 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
 
        return "Posted $dateString"
     }
+
+
 
 }

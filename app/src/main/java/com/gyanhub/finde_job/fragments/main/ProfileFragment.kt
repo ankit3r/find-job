@@ -120,14 +120,14 @@ class ProfileFragment : Fragment() {
     private fun uploadResume() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "application/pdf"
-        startActivityForResult(Intent.createChooser(intent, "Select PDF"), getString(R.string.download_resume).toInt())
+        startActivityForResult(Intent.createChooser(intent, "Select PDF"), 505)
 
     }
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == getString(R.string.download_resume).toInt() && resultCode == RESULT_OK) {
+        if (requestCode == 505 && resultCode == RESULT_OK) {
             // Get the selected file URI
             val fileUri = data?.data
 
