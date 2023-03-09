@@ -1,5 +1,9 @@
 package com.gyanhub.finde_job.activity
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -33,6 +37,9 @@ class MainActivity : AppCompatActivity() {
         mainModel = ViewModelProvider(this)[MainViewModel::class.java]
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         setFragment(mainModel.fragment)
+
+
+
         binding.bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {

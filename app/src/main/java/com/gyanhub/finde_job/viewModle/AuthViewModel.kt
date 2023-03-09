@@ -46,4 +46,6 @@ class AuthViewModel : ViewModel() {
         authRepository.uploadResume(fileUri,callback)
     }
 
+
+
 }

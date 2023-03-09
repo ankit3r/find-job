@@ -58,10 +58,7 @@ dependencies {
     // gson cover
     implementation 'com.google.code.gson:gson:2.10.1'
 
-    // pdf view
-    implementation('com.github.barteksc:android-pdf-viewer:2.8.2') {
-        exclude group: 'com.android.support', module: 'support-v4'
-    }
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    // runtime permission
+    implementation 'com.karumi:dexter:6.2.2'
 
 }

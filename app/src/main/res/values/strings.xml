@@ -29,5 +29,6 @@
     <string name="post">Post Job</string>
     <string name="enter_city_name">Enter City Name</string>
     <string name="upload_resume">Upload Resume</string>
-    <string name="download_resume">Download Resume</string>
+    <string name="download_resume">View Resume</string>
+    <string name="requestCode">505</string>
 </resources>
