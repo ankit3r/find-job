@@ -31,4 +31,5 @@
     <string name="upload_resume">Upload Resume</string>
     <string name="download_resume">View Resume</string>
     <string name="requestCode">505</string>
+    <string name="log_out">Log out</string>
 </resources>

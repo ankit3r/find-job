@@ -25,7 +25,7 @@
             android:minHeight="350dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="vertical">
@@ -39,29 +39,29 @@
                 <TextView
                     android:id="@+id/txtUserName"
                     style="@style/menuTextStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:maxLines="1"
-                    android:text="User Name"
+                    android:layout_gravity="center"
                     android:textAlignment="center" />
 
                 <TextView
                     android:id="@+id/txtUserPhNo"
                     style="@style/menuTextStyle"
-                    android:layout_width="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="0213654793"
                     android:textAlignment="center" />
 
                 <TextView
                     android:id="@+id/txtUserEmail"
                     style="@style/menuTextStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="abc@gmail.com"
                     android:textAlignment="center" />
 
                 <TextView
@@ -71,7 +71,6 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:layout_marginTop="20dp"
-                    android:text="View Resume"
                     android:textAlignment="center" />
 
             </LinearLayout>
@@ -86,7 +85,7 @@
         android:layout_marginEnd="52dp"
         android:layout_marginBottom="32dp"
         android:backgroundTint="@android:color/darker_gray"
-        android:text="Log out"
+        android:text="@string/log_out"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
