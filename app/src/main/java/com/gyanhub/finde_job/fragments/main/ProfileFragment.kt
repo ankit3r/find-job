@@ -1,10 +1,13 @@
 package com.gyanhub.finde_job.fragments.main
 
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.*
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -26,6 +29,7 @@ import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.FragmentHolderActivity
 import com.gyanhub.finde_job.databinding.FragmentMenuBinding
 import com.gyanhub.finde_job.viewModle.AuthViewModel
+import com.gyanhub.finde_job.viewModle.DbViewModel
 import java.io.File
 
 @Suppress("DEPRECATION")
@@ -34,9 +38,10 @@ class ProfileFragment : Fragment() {
     private lateinit var auth: AuthViewModel
     private lateinit var dialog: AlertDialog
     private lateinit var resumeUrl: String
+    private lateinit var dbModel: DbViewModel
 
 
-
+    @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +49,14 @@ class ProfileFragment : Fragment() {
     ): View {
         binding = FragmentMenuBinding.inflate(layoutInflater, container, false)
         auth = ViewModelProvider(this)[AuthViewModel::class.java]
+        dbModel = ViewModelProvider(this)[DbViewModel::class.java]
+        dbModel.showProgressBar()
         progressBar()
+        if (dbModel.life) {
+            dbModel.progressBarVisible.observe(viewLifecycleOwner) {
+                if (it) dialog.show() else dialog.dismiss()
+            }
+        }
         resumeUrl = ""
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -59,7 +71,6 @@ class ProfileFragment : Fragment() {
 
         }
         auth.getUser { success, user, error ->
-
             if (success && user != null) {
                 binding.txtUserName.text = user.name
                 binding.txtUserEmail.text = user.email
@@ -70,10 +81,10 @@ class ProfileFragment : Fragment() {
                     resumeUrl = user.resume
                     binding.txtUserResume.text = getString(R.string.download_resume)
                 }
-                dialog.dismiss()
+                dbModel.hideProgressBar()
             } else {
                 Toast.makeText(context, "Error $error", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
+                dbModel.hideProgressBar()
             }
         }
 
@@ -83,15 +94,15 @@ class ProfileFragment : Fragment() {
             } else {
                 val notificationManagerCompat = NotificationManagerCompat.from(requireContext())
                 val areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled()
+                getPermission()
                 if (!areNotificationsEnabled) {
                     // Request permission to show notifications
                     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                     intent.putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().packageName)
                     startActivity(intent)
-                }else
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        downloadResume(resumeUrl)
-                    }
+                } else
+                    Toast.makeText(context, "downloading", Toast.LENGTH_SHORT).show()
+                    downloadResume(resumeUrl)
             }
 
         }
@@ -113,9 +124,7 @@ class ProfileFragment : Fragment() {
         builder.setView(view)
         builder.setCancelable(false)
         dialog = builder.create()
-        dialog.show()
     }
-
 
     private fun uploadResume() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
@@ -130,19 +139,21 @@ class ProfileFragment : Fragment() {
         if (requestCode == 505 && resultCode == RESULT_OK) {
             // Get the selected file URI
             val fileUri = data?.data
-
+            dbModel.showProgressBar()
             auth.uploadResume(fileUri!!) { success, error, _ ->
                 if (success) {
                     binding.txtUserResume.text = getString(R.string.download_resume)
-
-                } else
+                    dbModel.hideProgressBar()
+                } else {
                     Toast.makeText(context, "Error $error", Toast.LENGTH_SHORT).show()
+                    dbModel.hideProgressBar()
+                }
             }
 
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
+
     private fun downloadResume(uri: String) {
         val storageRef = Firebase.storage.getReferenceFromUrl(uri)
 
@@ -152,40 +163,59 @@ class ProfileFragment : Fragment() {
         val downloadTask = storageRef.getFile(file)
 
         downloadTask.addOnProgressListener { taskSnapshot ->
-            val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
+            val progress =
+                (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
 
-            val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val notificationBuilder = NotificationCompat.Builder(requireContext(), "DownloadChannel")
-                .setSmallIcon(R.drawable.ic_download)
-                .setContentTitle("Downloading Resume")
-                .setContentText("Download in progress")
-                .setProgress(100, progress, false)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+            val notificationManager =
+                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationBuilder =
+                NotificationCompat.Builder(requireContext(), "DownloadChannel")
+                    .setSmallIcon(R.drawable.ic_download)
+                    .setContentTitle("Downloading Resume")
+                    .setContentText("Download in progress")
+                    .setProgress(100, progress, false)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
 
             notificationManager.notify(1, notificationBuilder.build())
         }.addOnSuccessListener {
-            val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager =
+                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.cancel(1)
 
             val notificationIntent = Intent(Intent.ACTION_VIEW)
             notificationIntent.setDataAndType(Uri.fromFile(file), "application/pdf")
-            notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            notificationIntent.flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
 
-            val contentUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.file-provider", file)
+            val contentUri = FileProvider.getUriForFile(
+                requireContext(),
+                "${requireContext().packageName}.file-provider",
+                file
+            )
             notificationIntent.setDataAndType(contentUri, "application/pdf")
             notificationIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-            val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE)
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                notificationIntent,
+                PendingIntent.FLAG_MUTABLE
+            )
 
-            val notificationBuilder = NotificationCompat.Builder(requireContext(), "DownloadChannel")
-                .setSmallIcon(R.drawable.ic_download)
-                .setContentTitle("Resume Downloaded")
-                .setContentText("Tap to open")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
+            val notificationBuilder =
+                NotificationCompat.Builder(requireContext(), "DownloadChannel")
+                    .setSmallIcon(R.drawable.ic_download)
+                    .setContentTitle("Resume Downloaded")
+                    .setContentText("Tap to open")
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
             notificationManager.notify(2, notificationBuilder.build())
-            val snackbar = Snackbar.make(requireView(), "Resume downloaded successfully", Snackbar.LENGTH_INDEFINITE)
+            val snackbar = Snackbar.make(
+                requireView(),
+                "Resume downloaded successfully",
+                Snackbar.LENGTH_INDEFINITE
+            )
             snackbar.setAction("Open") {
                 val intent = Intent(Intent.ACTION_VIEW)
                 val contentUris = FileProvider.getUriForFile(
@@ -204,5 +234,22 @@ class ProfileFragment : Fragment() {
         }
 
     }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 123) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
 
+            } else {
+                getPermission()
+
+            }
+        }
+    }
+private fun getPermission(){
+    requestPermissions(arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ), 123)
+}
 }

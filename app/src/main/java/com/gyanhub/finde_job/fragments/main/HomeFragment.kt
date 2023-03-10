@@ -45,6 +45,7 @@ class HomeFragment() : Fragment(), HomeInterface {
     private lateinit var progressBar: AlertDialog
     private lateinit var list: List<Job>
     private lateinit var yourJoblist: List<String>
+    private lateinit var resume :String
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -74,6 +75,7 @@ class HomeFragment() : Fragment(), HomeInterface {
             authModel.getUser { b, user, s ->
                 if (b && user != null) {
                     yourJoblist = user.job
+                    resume = user.resume
                    if (jobModel.life){
                        jobModel.getJob.observe(viewLifecycleOwner) {
                            list = it
@@ -350,10 +352,14 @@ class HomeFragment() : Fragment(), HomeInterface {
         if (id in yourJoblist) {
             itemClickOption(id)
         } else {
-            val intent = Intent(context, HolderActivity::class.java)
-            intent.putExtra("f", 0)
-            intent.putExtra("id", id)
-            requireActivity().startActivity(intent)
+            if(resume.isEmpty()){
+                Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
+            }else{
+                val intent = Intent(context, HolderActivity::class.java)
+                intent.putExtra("f", 0)
+                intent.putExtra("id", id)
+                requireActivity().startActivity(intent)
+            }
         }
     }
 
