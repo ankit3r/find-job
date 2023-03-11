@@ -354,14 +354,14 @@ class HomeFragment : Fragment(), HomeInterface {
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
-    private fun itemClickOption(id: String,value:Int) {
+    private fun itemClickOption(id: String) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("This Job Posted By You")
         builder.setMessage("What do you want? View Or Delete Job")
         builder.setCancelable(false)
         builder.setPositiveButton("View") { dialog, _ ->
             val intent = Intent(context, HolderActivity::class.java)
-            intent.putExtra("f", value)
+            intent.putExtra("f", 1)
             intent.putExtra("id", id)
             requireActivity().startActivity(intent)
             dialog.dismiss()
@@ -409,10 +409,10 @@ class HomeFragment : Fragment(), HomeInterface {
 
     override fun onClick(id: String, applied: Boolean) {
         if (applied){
-            Toast.makeText(context, "You have already tried to apply this one if you want Reapply hold job", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "You have already tried to apply this one if you want Reapply hold job", Toast.LENGTH_LONG).show()
         }else{
             if (id in yourJoblist) {
-                itemClickOption(id,1)
+                itemClickOption(id)
             } else {
                 if(resume.isEmpty()){
                     Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()

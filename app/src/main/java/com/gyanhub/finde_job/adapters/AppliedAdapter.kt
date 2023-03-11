@@ -3,7 +3,6 @@ package com.gyanhub.finde_job.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.adapters.onClickInterface.AppliedClick
@@ -16,8 +15,8 @@ class AppliedAdapter(private val context:Context,private val appliedJobList: Lis
         fun bind(data: Job, click: AppliedClick) {
           binding.apply {
             data.apply {
-                txtTitleA.text = context.getString(R.string.job_type_and_state, jobTitle, state)
-                txtJobTypeA.text = context.getString(R.string.job_type_and_state, jobType, pay)
+                txtTitleA.text = context.getString(R.string.job_title_and_state, jobTitle, state)
+                txtJobTypeA.text = context.getString(R.string.job_type_and_pay, jobType, pay)
                 txtTotalA.text = context.getString(R.string.job_total_applied,totalApplied.toString())
             }
               btnViewResponse.setOnClickListener {
