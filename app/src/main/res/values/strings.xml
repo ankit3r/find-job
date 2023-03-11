@@ -32,4 +32,8 @@
     <string name="download_resume">View Resume</string>
     <string name="requestCode">505</string>
     <string name="log_out">Log out</string>
+    <string name="skill_s_required">Skill(s) required</string>
+    <string name="who_can_apply">Who Can Apply</string>
+    <string name="send">Send</string>
+    <string name="we_need_send_your_profile_data_to_the_organization_s_hr">We need send your profile data to the organization\'s HR</string>
 </resources>

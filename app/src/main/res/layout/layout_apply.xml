@@ -13,16 +13,23 @@
         android:layout_centerHorizontal="true"
         style="@style/textStyle_20sp_bold"/>
     <TextView
+        android:id="@+id/textUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textV"
+        style="@style/textStyle_16sp_bold"/>
+    <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="We need send your profile data to organization HR"
-        android:layout_below="@id/textV"
-        style="@style/textStyle_16sp"/>
+        android:text="@string/we_need_send_your_profile_data_to_the_organization_s_hr"
+        android:layout_below="@id/textUserName"
+        style="@style/textStyle_16sp_bold"/>
     <Button
+        android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send"
+        android:text="@string/send"
         android:layout_below="@id/text"
         android:layout_centerHorizontal="true"/>
 

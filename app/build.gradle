@@ -60,5 +60,6 @@ dependencies {
 
     // runtime permission
     implementation 'com.karumi:dexter:6.2.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
 
 }
