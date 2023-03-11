@@ -250,7 +250,6 @@ class HomeFragment : Fragment(), HomeInterface {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Toast.makeText(context, "enter: $query", Toast.LENGTH_SHORT).show()
                 adapter.filter.filter(query)
                 hideKeyboard()
                 searchView.clearFocus()
@@ -258,7 +257,6 @@ class HomeFragment : Fragment(), HomeInterface {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Toast.makeText(context, "enter: $newText", Toast.LENGTH_SHORT).show()
                 adapter.filter.filter(newText)
 
                 return false
@@ -271,7 +269,6 @@ class HomeFragment : Fragment(), HomeInterface {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.btnFilter -> {
-                Toast.makeText(context, "click on filter", Toast.LENGTH_SHORT).show()
                 if (filterLayout.visibility == View.VISIBLE) filterLayout.visibility =
                     View.GONE
                 else filterLayout.visibility = View.VISIBLE
@@ -357,14 +354,14 @@ class HomeFragment : Fragment(), HomeInterface {
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
-    private fun itemClickOption(id: String) {
+    private fun itemClickOption(id: String,value:Int) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("This Job Posted By You")
         builder.setMessage("What do you want? View Or Delete Job")
         builder.setCancelable(false)
         builder.setPositiveButton("View") { dialog, _ ->
             val intent = Intent(context, HolderActivity::class.java)
-            intent.putExtra("f", 0)
+            intent.putExtra("f", value)
             intent.putExtra("id", id)
             requireActivity().startActivity(intent)
             dialog.dismiss()
@@ -415,7 +412,7 @@ class HomeFragment : Fragment(), HomeInterface {
             Toast.makeText(context, "You have already tried to apply this one if you want Reapply hold job", Toast.LENGTH_SHORT).show()
         }else{
             if (id in yourJoblist) {
-                itemClickOption(id)
+                itemClickOption(id,1)
             } else {
                 if(resume.isEmpty()){
                     Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
