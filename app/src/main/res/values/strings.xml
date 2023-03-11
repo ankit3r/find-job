@@ -42,4 +42,5 @@
     <string name="w">h</string>
     <string name="view_full_details">view full details</string>
     <string name="delete">Delete</string>
+    <string name="error_massage">You Haven\'t applied any Job</string>
 </resources>

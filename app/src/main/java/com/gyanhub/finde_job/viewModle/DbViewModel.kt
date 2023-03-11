@@ -32,6 +32,7 @@ class DbViewModel : ViewModel() {
     val payField = "filterPay"
     val stateField = "state"
     val typeField = "jobType"
+    var phNo = ""
     fun showProgressBar() {
         _progressBarVisible.postValue(true)
     }

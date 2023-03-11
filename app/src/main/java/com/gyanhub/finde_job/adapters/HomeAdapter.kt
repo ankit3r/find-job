@@ -52,6 +52,15 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
             }else
                 onClick.onClick(job.jobId,false)
         }
+        holder.itemView.setOnLongClickListener {
+            if (job.jobId in appliedJobList){
+                onClick.onReApplied(job.jobId,true)
+            }else{
+                onClick.onClick(job.jobId,false)
+            }
+
+            true
+        }
     }
 
     override fun getItemCount(): Int {

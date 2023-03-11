@@ -18,9 +18,10 @@ class HolderActivity : AppCompatActivity() {
         setContentView(binding.root)
         position = intent.getIntExtra("f",0)
         jobId = intent.getStringExtra("id").toString()
-        Toast.makeText(this, "id = $jobId", Toast.LENGTH_SHORT).show()
         when(position){
-            0 -> setFragment(ViewJobFragment(jobId))
+            0 -> setFragment(ViewJobFragment(jobId,false,false))
+            1 -> setFragment(ViewJobFragment(jobId,true,false))
+            2 -> setFragment(ViewJobFragment(jobId,false,true))
         }
     }
 

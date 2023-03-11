@@ -412,7 +412,7 @@ class HomeFragment : Fragment(), HomeInterface {
 
     override fun onClick(id: String, applied: Boolean) {
         if (applied){
-            Toast.makeText(context, "you already applied this one", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "You have already tried to apply this one if you want Reapply hold job", Toast.LENGTH_SHORT).show()
         }else{
             if (id in yourJoblist) {
                 itemClickOption(id)
@@ -427,6 +427,13 @@ class HomeFragment : Fragment(), HomeInterface {
                 }
             }
         }
+    }
+
+    override fun onReApplied(id: String, applied: Boolean) {
+        val intent = Intent(context, HolderActivity::class.java)
+        intent.putExtra("f", 2)
+        intent.putExtra("id", id)
+        requireActivity().startActivity(intent)
     }
 
 }

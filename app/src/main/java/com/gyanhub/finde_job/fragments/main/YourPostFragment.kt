@@ -17,13 +17,10 @@ import com.google.gson.Gson
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.HolderActivity
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
-import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.adapters.YourPostAdapter
-import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.adapters.onClickInterface.YourJobClick
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
-import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.State
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
@@ -39,14 +36,13 @@ class YourPostFragment : Fragment(), YourJobClick {
     private lateinit var list: List<String>
     private lateinit var jobType: String
     private lateinit var state: String
-    private var life = true
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        life = true
+
         binding = FragmentYourPostBinding.inflate(layoutInflater, container, false)
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         authModel = ViewModelProvider(this)[AuthViewModel::class.java]
@@ -57,11 +53,11 @@ class YourPostFragment : Fragment(), YourJobClick {
             if (visible) progressBar.show() else progressBar.dismiss()
         }
         dbModel.showProgressBar()
-        authModel.getUser { success, user, error ->
+        authModel.getUser { success, user, _ ->
             if (success && !user?.job.isNullOrEmpty()) {
                 dbModel.getYourJobs(user!!.job) { s, e ->
                     if (s) {
-                        if (life) {
+                        if (dbModel.life) {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
                                 binding.rcYourPost.adapter = YourPostAdapter(requireContext(),it,this)
                                 binding.textView.visibility = View.GONE
@@ -202,11 +198,11 @@ class YourPostFragment : Fragment(), YourJobClick {
     }
 
     override fun onDestroy() {
-        life = false
+        dbModel.life = false
         super.onDestroy()
     }
 
-    fun isValidMobileNumber(mobileNumber: String): Boolean {
+    private fun isValidMobileNumber(mobileNumber: String): Boolean {
         val regex = Regex("^[6-9]\\d{9}\$")
         return regex.matches(mobileNumber)
     }
@@ -217,9 +213,9 @@ class YourPostFragment : Fragment(), YourJobClick {
         builder.setTitle("Delete Item")
         builder.setMessage("Are you sure you want to delete this item?")
         builder.setCancelable(false)
-        builder.setPositiveButton("Yes") { dialogs, which ->
+        builder.setPositiveButton("Yes") { dialogs, _ ->
             dbModel.showProgressBar()
-            dbModel.deleteJob(id) { success, error ->
+            dbModel.deleteJob(id) { success, _ ->
                 if (success) {
                     dbModel.hideProgressBar()
                     Toast.makeText(context, "Item delete ", Toast.LENGTH_SHORT).show()
@@ -232,7 +228,7 @@ class YourPostFragment : Fragment(), YourJobClick {
             dialogs.dismiss()
         }
 
-        builder.setNegativeButton("No") { dialogs, which ->
+        builder.setNegativeButton("No") { dialogs, _ ->
             dialogs.dismiss()
         }
         val dialog = builder.create()
@@ -241,7 +237,7 @@ class YourPostFragment : Fragment(), YourJobClick {
 
     override fun onClickView(id: String) {
         val intent = Intent(context, HolderActivity::class.java)
-        intent.putExtra("f", 0)
+        intent.putExtra("f", 1)
         intent.putExtra("id", id)
         requireActivity().startActivity(intent)
     }

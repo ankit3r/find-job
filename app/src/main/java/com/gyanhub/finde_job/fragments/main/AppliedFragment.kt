@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.adapters.AppliedAdapter
@@ -36,15 +37,22 @@ class AppliedFragment : Fragment(), AppliedClick {
             }
             authModel.getUser { success, user, _ ->
                 if (success && user != null) {
-                    jobModel.getYourJobs(user.youApply) { s, _ ->
-                        if (s) {
-                            jobModel.yourJob.observe(viewLifecycleOwner) {
-                                binding.rcApplied.adapter = AppliedAdapter(requireContext(), it, this)
-                                jobModel.hideProgressBar()
-                            }
-                        }else
-                            jobModel.hideProgressBar()
-                    }
+                  if (user.youApply.isNotEmpty()){
+                      binding.txtMessage.visibility = View.GONE
+                      jobModel.getYourJobs(user.youApply) { s, _ ->
+                          if (s) {
+                              jobModel.yourJob.observe(viewLifecycleOwner) {
+                                  binding.rcApplied.adapter = AppliedAdapter(requireContext(), it, this)
+                                  jobModel.hideProgressBar()
+                              }
+                          }else
+                              jobModel.hideProgressBar()
+                      }
+                  }else {
+                      jobModel.hideProgressBar()
+                      binding.txtMessage.visibility = View.VISIBLE
+                    binding.txtMessage.text = getString(R.string.error_massage)
+                  }
                 }else
                     jobModel.hideProgressBar()
             }

@@ -33,13 +33,12 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 @SuppressLint("SetTextI18n")
-class ViewJobFragment(private val jobId: String) : Fragment() {
+class ViewJobFragment(private val jobId: String, private val v: Boolean,private val re:Boolean) : Fragment() {
     private lateinit var binding: FragmentViewJobBinding
     private lateinit var bottomBinding: LayoutApplyBinding
     private lateinit var dbModel: DbViewModel
     private lateinit var userDb: AuthViewModel
     private lateinit var dialog: AlertDialog
-    private lateinit var hrNo: String
 
 
     override fun onCreateView(
@@ -50,28 +49,42 @@ class ViewJobFragment(private val jobId: String) : Fragment() {
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         userDb = ViewModelProvider(this)[AuthViewModel::class.java]
         progressBar()
-        hrNo = ""
-        dbModel.getJobById(jobId) { success, data, _ ->
-            if (success && data != null) {
-                data.apply {
-                    binding.apply {
-                        txtJobTitle.text = "$jobTitle ($jobType)"
-                        txtJobDis.text = jobDisc
-                        txtAbout.text = "About $jobType"
-                        txtPay.text = "$pay /Month"
-                        txtCyName.text = "$jobCyName ($city, $state)"
-                        txtSkill.text = skils.toString()
-                        txtOpportunities.text = "Numbers of Vacancies :- $jobPostOpportunitity"
-                        txtWhoCanApply.text = whoCanApply
-                    }
-                    hrNo = whNo
-                }
-                dialog.dismiss()
-
-            } else
-                dialog.dismiss()
-
+        if (v){
+            binding.btnApplied.visibility = View.GONE
         }
+        if(re){
+            binding.btnApplied.text = "ReApply Now"
+        }
+        if (dbModel.life) {
+            dbModel.showProgressBar()
+            dbModel.progressBarVisible.observe(viewLifecycleOwner) {
+                if (it) dialog.show() else dialog.dismiss()
+            }
+            dbModel.getJobById(jobId) { success, data, _ ->
+                if (success && data != null) {
+                    data.apply {
+                        binding.apply {
+                            txtJobTitle.text = "$jobTitle ($jobType)"
+                            txtJobDis.text = jobDisc
+                            txtAbout.text = "About $jobType"
+                            txtPay.text = "$pay /Month"
+                            txtCyName.text = "$jobCyName ($city, $state)"
+                            txtSkill.text = skils.toString()
+                            txtOpportunities.text = "Numbers of Vacancies :- $jobPostOpportunitity"
+                            txtWhoCanApply.text = whoCanApply
+                            txtTotalAppled.text =
+                                getString(R.string.job_total_applied, totalApplied.toString())
+                        }
+                        dbModel.phNo = whNo
+                    }
+                    dbModel.hideProgressBar()
+
+                } else
+                    dbModel.hideProgressBar()
+
+            }
+        }
+
 
         binding.btnApplied.setOnClickListener {
             bottomSheet()
@@ -86,7 +99,6 @@ class ViewJobFragment(private val jobId: String) : Fragment() {
         builder.setView(view)
         builder.setCancelable(false)
         dialog = builder.create()
-        dialog.show()
     }
 
 
@@ -95,31 +107,47 @@ class ViewJobFragment(private val jobId: String) : Fragment() {
         val bottomSheetDialog = BottomSheetDialog(requireActivity())
         bottomBinding = LayoutApplyBinding.inflate(layoutInflater)
         bottomSheetDialog.setContentView(bottomBinding.root)
-
-        userDb.getUser { b, user, s ->
+        dbModel.showProgressBar()
+        userDb.getUser { b, user, _ ->
             if (b && user != null) {
+                dbModel.hideProgressBar()
                 bottomBinding.textUserName.text = "Dear ${user.name}"
                 bottomBinding.btnSend.setOnClickListener {
                     val message =
                         "Applicant has applied here are the details check whether the applicant is qualified to join you or not." +
                                 "\n\n*Applicant Details:*\n\t\t*Name:*\t${user.name}\n\t\t*Mobile No:*\t${user.phNo}\n\t\t*Email ID:*\t${user.email}\n\t\t*Resume URL:* ${user.resume}"
-                    val uri = Uri.parse("http://api.whatsapp.com/send?phone=+91$hrNo&text=${Uri.encode(message)}")
+                    val uri = Uri.parse(
+                        "http://api.whatsapp.com/send?phone=+91${dbModel.phNo}&text=${
+                            Uri.encode(message)
+                        }"
+                    )
                     val intent = Intent(Intent.ACTION_VIEW, uri)
                     startActivity(intent)
-                    dbModel.appliedJob(jobId){success,error->
-                        if (success){
-                            Toast.makeText(context, "Thank you for applied. You wait for replayed", Toast.LENGTH_SHORT).show()
-                        }else{
-                            Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                   if (!re){
+                       dbModel.appliedJob(jobId) { success, error ->
+                           if (success) {
+                               Toast.makeText(
+                                   context,
+                                   "Thank you for applied. You wait for replayed",
+                                   Toast.LENGTH_SHORT
+                               ).show()
+                           } else {
+                               Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
+                           }
+                       }
+                   }
                     bottomSheetDialog.dismiss()
                 }
-            }
+            } else
+                dbModel.hideProgressBar()
         }
 
         bottomSheetDialog.show()
     }
 
+    override fun onDestroy() {
+        dbModel.life = false
+        super.onDestroy()
+    }
 
 }

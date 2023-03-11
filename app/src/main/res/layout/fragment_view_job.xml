@@ -114,14 +114,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txtWhoTitle" />
+            <TextView
+                style="@style/textStyle_18sp"
+                android:id="@+id/txtTotalAppled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtWhoCanApply"/>
 
             <Button
                 android:id="@+id/btnApplied"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/txtWhoCanApply"
+                android:layout_below="@+id/txtTotalAppled"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="13dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="15dp"
                 android:text="Apply Now" />
