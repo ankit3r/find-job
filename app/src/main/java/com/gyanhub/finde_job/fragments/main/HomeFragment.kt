@@ -3,7 +3,6 @@ package com.gyanhub.finde_job.fragments.main
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -30,7 +29,7 @@ import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 import com.gyanhub.finde_job.viewModle.MainViewModel
 
-class HomeFragment() : Fragment(), HomeInterface {
+class HomeFragment : Fragment(), HomeInterface {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var filterLayout: RelativeLayout
     private lateinit var filter: CardView
@@ -45,6 +44,7 @@ class HomeFragment() : Fragment(), HomeInterface {
     private lateinit var progressBar: AlertDialog
     private lateinit var list: List<Job>
     private lateinit var yourJoblist: List<String>
+    private lateinit var appliedJobList: List<String>
     private lateinit var resume :String
 
 
@@ -57,6 +57,7 @@ class HomeFragment() : Fragment(), HomeInterface {
         setHasOptionsMenu(true)
         list = listOf()
         yourJoblist = listOf()
+        appliedJobList = listOf()
 
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
         filter = requireActivity().findViewById(R.id.fllterBtn)
@@ -72,14 +73,15 @@ class HomeFragment() : Fragment(), HomeInterface {
             jobModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
                 if (visible) progressBar.show() else progressBar.dismiss()
             }
-            authModel.getUser { b, user, s ->
+            authModel.getUser { b, user, _ ->
                 if (b && user != null) {
                     yourJoblist = user.job
+                    appliedJobList = user.youApply
                     resume = user.resume
                    if (jobModel.life){
                        jobModel.getJob.observe(viewLifecycleOwner) {
                            list = it
-                           adapter = HomeAdapter(requireContext(), list, user.job, this)
+                           adapter = HomeAdapter(requireContext(), list, user.job,appliedJobList, this)
                            binding.rcJob.adapter = adapter
                            jobModel.hideProgressBar()
                        }
@@ -88,7 +90,7 @@ class HomeFragment() : Fragment(), HomeInterface {
             }
         }
 
-        adapter = HomeAdapter(requireContext(), list, yourJoblist, this)
+        adapter = HomeAdapter(requireContext(), list, yourJoblist, appliedJobList,this)
         setUpDropDownFilter()
         filter.setOnClickListener {
             jobModel.showProgressBar()
@@ -348,20 +350,6 @@ class HomeFragment() : Fragment(), HomeInterface {
         super.onDestroy()
     }
 
-    override fun onClick(id: String) {
-        if (id in yourJoblist) {
-            itemClickOption(id)
-        } else {
-            if(resume.isEmpty()){
-                Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
-            }else{
-                val intent = Intent(context, HolderActivity::class.java)
-                intent.putExtra("f", 0)
-                intent.putExtra("id", id)
-                requireActivity().startActivity(intent)
-            }
-        }
-    }
 
     private fun hideKeyboard() {
         val imm =
@@ -374,7 +362,7 @@ class HomeFragment() : Fragment(), HomeInterface {
         builder.setTitle("This Job Posted By You")
         builder.setMessage("What do you want? View Or Delete Job")
         builder.setCancelable(false)
-        builder.setPositiveButton("View") { dialog, which ->
+        builder.setPositiveButton("View") { dialog, _ ->
             val intent = Intent(context, HolderActivity::class.java)
             intent.putExtra("f", 0)
             intent.putExtra("id", id)
@@ -400,9 +388,9 @@ class HomeFragment() : Fragment(), HomeInterface {
         builder.setTitle("Delete Job")
         builder.setMessage("Are you sure you want to delete this Job?")
         builder.setCancelable(false)
-        builder.setPositiveButton("Yes") { dialogs, which ->
+        builder.setPositiveButton("Yes") { dialogs, _ ->
             jobModel.showProgressBar()
-            jobModel.deleteJob(id) { success, error ->
+            jobModel.deleteJob(id) { success, _ ->
                 if (success) {
                     jobModel.hideProgressBar()
                     Toast.makeText(context, "Item delete ", Toast.LENGTH_SHORT).show()
@@ -415,11 +403,30 @@ class HomeFragment() : Fragment(), HomeInterface {
             dialogs.dismiss()
         }
 
-        builder.setNegativeButton("No") { dialogs, which ->
+        builder.setNegativeButton("No") { dialogs, _ ->
             dialogs.dismiss()
         }
         val dialog = builder.create()
         dialog.show()
+    }
+
+    override fun onClick(id: String, applied: Boolean) {
+        if (applied){
+            Toast.makeText(context, "you already applied this one", Toast.LENGTH_SHORT).show()
+        }else{
+            if (id in yourJoblist) {
+                itemClickOption(id)
+            } else {
+                if(resume.isEmpty()){
+                    Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
+                }else{
+                    val intent = Intent(context, HolderActivity::class.java)
+                    intent.putExtra("f", 0)
+                    intent.putExtra("id", id)
+                    requireActivity().startActivity(intent)
+                }
+            }
+        }
     }
 
 }

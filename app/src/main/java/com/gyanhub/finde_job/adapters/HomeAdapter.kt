@@ -18,7 +18,7 @@ import com.gyanhub.finde_job.model.Job
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class HomeAdapter(private val context: Context, private val jobList: List<Job>, private val yourJobList: List<String>, private val onClick:HomeInterface) :
+class HomeAdapter(private val context: Context, private val jobList: List<Job>, private val yourJobList: List<String>,private val appliedJobList: List<String>, private val onClick:HomeInterface) :
     RecyclerView.Adapter<HomeAdapter.HomeViewHolder>(),Filterable {
 
     private var filteredList = jobList.toMutableList()
@@ -47,7 +47,10 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
         holder.type.text = job.jobType
         holder.pay.text = postDate(job.timestamp)
         holder.itemView.setOnClickListener {
-            onClick.onClick(job.jobId)
+            if (job.jobId in appliedJobList){
+                onClick.onClick(job.jobId,true)
+            }else
+                onClick.onClick(job.jobId,false)
         }
     }
 

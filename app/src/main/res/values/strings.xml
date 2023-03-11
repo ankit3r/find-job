@@ -35,5 +35,11 @@
     <string name="skill_s_required">Skill(s) required</string>
     <string name="who_can_apply">Who Can Apply</string>
     <string name="send">Send</string>
+    <string name="job_type_and_state">%1$s, %2$s</string>
+    <string name="job_total_applied">Total Applicant : %1$s</string>
     <string name="we_need_send_your_profile_data_to_the_organization_s_hr">We need send your profile data to the organization\'s HR</string>
+    <string name="view_response">View Response</string>
+    <string name="w">h</string>
+    <string name="view_full_details">view full details</string>
+    <string name="delete">Delete</string>
 </resources>

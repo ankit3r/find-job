@@ -18,7 +18,9 @@ import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.HolderActivity
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
+import com.gyanhub.finde_job.adapters.YourPostAdapter
 import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
+import com.gyanhub.finde_job.adapters.onClickInterface.YourJobClick
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
 import com.gyanhub.finde_job.model.Job
@@ -27,7 +29,7 @@ import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 
 
-class YourPostFragment : Fragment(), HomeInterface {
+class YourPostFragment : Fragment(), YourJobClick {
     private lateinit var binding: FragmentYourPostBinding
     private lateinit var dbModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
@@ -61,8 +63,7 @@ class YourPostFragment : Fragment(), HomeInterface {
                     if (s) {
                         if (life) {
                             dbModel.yourJob.observe(viewLifecycleOwner) {
-                                val dapter = HomeAdapter(requireContext(),it, user.job,this)
-                                binding.rcYourPost.adapter = dapter
+                                binding.rcYourPost.adapter = YourPostAdapter(requireContext(),it,this)
                                 binding.textView.visibility = View.GONE
                                 dbModel.hideProgressBar()
 
@@ -210,35 +211,6 @@ class YourPostFragment : Fragment(), HomeInterface {
         return regex.matches(mobileNumber)
     }
 
-    override fun onClick(id: String) {
-        itemClickOption(id)
-    }
-
-    private fun itemClickOption(id: String) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Item View")
-        builder.setMessage("What do you want? View Or Delete Item")
-        builder.setCancelable(false)
-        builder.setPositiveButton("View") { dialog, which ->
-            val intent = Intent(context, HolderActivity::class.java)
-            intent.putExtra("f", 0)
-            intent.putExtra("id", id)
-            requireActivity().startActivity(intent)
-            dialog.dismiss()
-        }
-
-
-
-        builder.setNegativeButton("Delete") { dialog, _ ->
-            deleteItemOption(id)
-            dialog.dismiss()
-        }
-
-        builder.setNeutralButton("Cancel") { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.create().show()
-    }
 
     private fun deleteItemOption(id: String) {
         val builder = AlertDialog.Builder(context)
@@ -265,6 +237,17 @@ class YourPostFragment : Fragment(), HomeInterface {
         }
         val dialog = builder.create()
         dialog.show()
+    }
+
+    override fun onClickView(id: String) {
+        val intent = Intent(context, HolderActivity::class.java)
+        intent.putExtra("f", 0)
+        intent.putExtra("id", id)
+        requireActivity().startActivity(intent)
+    }
+
+    override fun onClickDelete(id: String) {
+        deleteItemOption(id)
     }
 
 

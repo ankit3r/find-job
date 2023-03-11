@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="10dp"
+    style="@style/cardStyle">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/textStyle_20sp_bold"
+            android:text="@string/applied"
+            android:id="@+id/txtTitleA"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/textStyle_16sp"
+            android:text="@string/applied"
+            android:id="@+id/txtJobTypeA"
+            android:layout_below="@id/txtTitleA"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/textStyle_16sp"
+            android:text="@string/applied"
+            android:id="@+id/txtTotalA"
+            android:layout_below="@id/txtJobTypeA"/>
+
+        <Button
+            android:id="@+id/btnViewResponse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtTotalA"
+            android:layout_margin="10dp"
+            android:text="@string/view_response" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
