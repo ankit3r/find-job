@@ -33,6 +33,10 @@ class DbViewModel : ViewModel() {
     val stateField = "state"
     val typeField = "jobType"
     var phNo = ""
+    var resume :String = ""
+    var list: List<Job> = listOf()
+    var yourJoblist: List<String> = listOf()
+    var appliedJobList: List<String> = listOf()
     fun showProgressBar() {
         _progressBarVisible.postValue(true)
     }

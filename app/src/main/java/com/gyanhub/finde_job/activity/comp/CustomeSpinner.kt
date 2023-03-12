@@ -15,7 +15,6 @@ class CustomSpinner(context: Context, items: List<String>) :
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = super.getView(position, convertView, parent)
         val textView = view.findViewById<TextView>(R.id.spinner_item_text)
-        textView.setTextColor(context.resources.getColor(R.color.black))
         textView.text = getItem(position)
         return view
     }
@@ -24,7 +23,6 @@ class CustomSpinner(context: Context, items: List<String>) :
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = super.getDropDownView(position, convertView, parent)
         val textView = view.findViewById<TextView>(R.id.spinner_item_text)
-        textView.setTextColor(context.resources.getColor(R.color.black))
         textView.text = getItem(position)
         return view
     }

@@ -121,7 +121,6 @@ class DbRepository {
     ) {
         val jobLiveData = mutableListOf<Job>()
         jobCollection
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .whereEqualTo(fieldName, value)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -146,7 +145,6 @@ class DbRepository {
     ) {
         val jobLiveData = mutableListOf<Job>()
         jobCollection
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .whereGreaterThanOrEqualTo(fieldName, value)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -172,7 +170,6 @@ class DbRepository {
     ) {
         val jobLiveData = mutableListOf<Job>()
         jobCollection
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .whereGreaterThanOrEqualTo("filterPay", pay)
             .whereEqualTo("state", location)
             .whereEqualTo("jobType", type)
@@ -200,7 +197,6 @@ class DbRepository {
     ) {
         val jobLiveData = mutableListOf<Job>()
         jobCollection
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .whereGreaterThanOrEqualTo("filterPay", pay)
             .whereEqualTo(filedName, value)
             .addSnapshotListener { snapshot, error ->

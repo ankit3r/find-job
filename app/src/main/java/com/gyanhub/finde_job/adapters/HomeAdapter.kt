@@ -1,9 +1,10 @@
 package com.gyanhub.finde_job.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.gyanhub.finde_job.R
@@ -20,11 +22,15 @@ import com.gyanhub.finde_job.model.Job
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class HomeAdapter(private val context: Context, private val jobList: List<Job>, private val yourJobList: List<String>,private val appliedJobList: List<String>, private val onClick:HomeInterface) :
-    RecyclerView.Adapter<HomeAdapter.HomeViewHolder>(),Filterable {
+class HomeAdapter(
+    private val context: Context,
+    private val jobList: List<Job>,
+    private val yourJobList: List<String>,
+    private val appliedJobList: List<String>,
+    private val onClick:HomeInterface
+    ) : RecyclerView.Adapter<HomeAdapter.HomeViewHolder>(),Filterable {
 
     private var filteredList = jobList.toMutableList()
-
 
     inner class HomeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title :TextView = view.findViewById(R.id.cardTextTitle)
@@ -42,15 +48,22 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
 
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
         val job = filteredList[position]
+        val currentMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val isNightMode = currentMode == Configuration.UI_MODE_NIGHT_YES
         if(job.jobId in yourJobList){
-            val color = Color.parseColor("#AFE1B2")
-            holder.itemCard.backgroundTintList = ColorStateList.valueOf(color)
+            val colorResId = if (isNightMode) R.color.card_background_dark1 else R.color.card_background1
+            val color = ContextCompat.getColor(context, colorResId)
+            holder.itemCard.setCardBackgroundColor(color)
+//            val color = Color.parseColor("#AFE1B2")
+//            holder.itemCard.backgroundTintList = ColorStateList.valueOf(color)
         }
         if(job.jobId in appliedJobList){
-            val color = Color.parseColor("#E6DE94")
-            holder.itemCard.backgroundTintList = ColorStateList.valueOf(color)
+            val colorResId = if (isNightMode) R.color.card_background_dark2 else R.color.card_background2
+            val color = ContextCompat.getColor(context, colorResId)
+            holder.itemCard.setCardBackgroundColor(color)
+//            val color = Color.parseColor("#E6DE94")
+//            holder.itemCard.backgroundTintList = ColorStateList.valueOf(color)
         }
-
         holder.apply {
             job.apply {
                 title.text = jobTitle
@@ -59,8 +72,6 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
                 payT.text = postDate(timestamp)
             }
         }
-
-
         holder.itemView.setOnClickListener {
             if (job.jobId in appliedJobList){
                 onClick.onClick(job.jobId,true)
@@ -95,6 +106,7 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
                 return filterResults
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 filteredList = results?.values as MutableList<Job>
                 notifyDataSetChanged()
@@ -106,18 +118,13 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
         val timestamp: Timestamp = time
         val postDate = timestamp.toDate()
         val currentDate = Date()
-
         val daysDiff = TimeUnit.DAYS.convert(currentDate.time - postDate.time, TimeUnit.MILLISECONDS)
-
         val dateString = when (daysDiff) {
             0L -> "today"
             1L -> "yesterday"
             else -> DateUtils.formatDateTime(context, postDate.time, DateUtils.FORMAT_SHOW_DATE)
         }
-
-       return "Posted $dateString"
+       return "Posted: $dateString"
     }
-
-
 
 }

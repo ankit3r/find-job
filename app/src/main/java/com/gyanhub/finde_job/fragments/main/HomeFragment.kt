@@ -23,7 +23,6 @@ import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.HomeAdapter
 import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.databinding.FragmentHomeBinding
-import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.State
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
@@ -42,11 +41,6 @@ class HomeFragment : Fragment(), HomeInterface {
     private lateinit var authModel: AuthViewModel
     private lateinit var adapter: HomeAdapter
     private lateinit var progressBar: AlertDialog
-    private lateinit var list: List<Job>
-    private lateinit var yourJoblist: List<String>
-    private lateinit var appliedJobList: List<String>
-    private lateinit var resume :String
-
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
@@ -55,10 +49,6 @@ class HomeFragment : Fragment(), HomeInterface {
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         setHasOptionsMenu(true)
-        list = listOf()
-        yourJoblist = listOf()
-        appliedJobList = listOf()
-
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
         filter = requireActivity().findViewById(R.id.fllterBtn)
         filter1 = requireActivity().findViewById(R.id.btnFilter1)
@@ -75,13 +65,13 @@ class HomeFragment : Fragment(), HomeInterface {
             }
             authModel.getUser { b, user, _ ->
                 if (b && user != null) {
-                    yourJoblist = user.job
-                    appliedJobList = user.youApply
-                    resume = user.resume
+                    jobModel.yourJoblist = user.job
+                    jobModel.appliedJobList = user.youApply
+                    jobModel.resume = user.resume
                    if (jobModel.life){
                        jobModel.getJob.observe(viewLifecycleOwner) {
-                           list = it
-                           adapter = HomeAdapter(requireContext(), list, user.job,appliedJobList, this)
+                           jobModel.list = it
+                           adapter = HomeAdapter(requireContext(), jobModel.list, user.job,jobModel.appliedJobList, this)
                            binding.rcJob.adapter = adapter
                            jobModel.hideProgressBar()
                        }
@@ -89,8 +79,7 @@ class HomeFragment : Fragment(), HomeInterface {
                 }
             }
         }
-
-        adapter = HomeAdapter(requireContext(), list, yourJoblist, appliedJobList,this)
+        adapter = HomeAdapter(requireContext(),jobModel.list, jobModel.yourJoblist, jobModel.appliedJobList,this)
         setUpDropDownFilter()
         filter.setOnClickListener {
             jobModel.showProgressBar()
@@ -98,7 +87,6 @@ class HomeFragment : Fragment(), HomeInterface {
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByState != "All"
             ) {
-                massage("All Filed Filter")
                 jobModel.multiplFieldFilter(
                     mainModel.filterByPay.toInt(),
                     mainModel.filterByState,
@@ -119,7 +107,6 @@ class HomeFragment : Fragment(), HomeInterface {
                 && mainModel.filterByPay == "All"
                 && mainModel.filterByState != "All"
             ) {
-                massage("job type or state")
                 jobModel.multiplFieldFilter(
                     0,
                     mainModel.filterByState,
@@ -140,7 +127,7 @@ class HomeFragment : Fragment(), HomeInterface {
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByState != "All"
             ) {
-                massage("pay or state")
+
                 jobModel.doubleValueFilter(
                     mainModel.filterByPay.toInt(),
                     mainModel.filterByState,
@@ -161,7 +148,7 @@ class HomeFragment : Fragment(), HomeInterface {
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByJobType != "All"
             ) {
-                massage("pay or job type")
+
                 jobModel.doubleValueFilter(
                     mainModel.filterByPay.toInt(),
                     mainModel.filterByJobType,
@@ -183,12 +170,12 @@ class HomeFragment : Fragment(), HomeInterface {
                 && mainModel.filterByPay == "All"
                 && mainModel.filterByState == "All"
             ) {
-                massage("no filter")
+
                 jobModel.getAllJob()
                 adapter.notifyDataSetChanged()
                 jobModel.hideProgressBar()
             } else if (mainModel.filterByJobType != "All") {
-                massage("job type")
+
                 jobModel.singlFieldFilter(
                     jobModel.typeField,
                     mainModel.filterByJobType
@@ -204,7 +191,7 @@ class HomeFragment : Fragment(), HomeInterface {
                     }
                 }
             } else if (mainModel.filterByPay != "All") {
-                massage("Pay")
+
                 jobModel.filterPay(
                     jobModel.payField,
                     mainModel.filterByPay.toInt()
@@ -220,7 +207,6 @@ class HomeFragment : Fragment(), HomeInterface {
                     }
                 }
             } else if (this.mainModel.filterByState != "All") {
-                massage("state")
                 jobModel.singlFieldFilter(
                     jobModel.stateField,
                     mainModel.filterByState
@@ -258,12 +244,9 @@ class HomeFragment : Fragment(), HomeInterface {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 adapter.filter.filter(newText)
-
                 return false
             }
-
         })
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -298,7 +281,7 @@ class HomeFragment : Fragment(), HomeInterface {
         spinnerItems.addAll(Gson().fromJson(jsonString, itemType))
 
 
-        dropdown(filter1, jobModel.listOfPay) { success, data ->
+        dropdown(filter1, jobModel.listOfJobType) { success, data ->
             if (success) {
                 mainModel.filterByJobType = data
             }
@@ -318,6 +301,7 @@ class HomeFragment : Fragment(), HomeInterface {
     }
 
     private fun dropdown(view: Spinner, list: List<String>, callback: (Boolean, String) -> Unit) {
+        hideKeyboard()
         val adapter = CustomSpinner(requireActivity(), list)
         view.adapter = adapter
         view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -337,16 +321,11 @@ class HomeFragment : Fragment(), HomeInterface {
 
     }
 
-    private fun massage(massage: String) {
-        Toast.makeText(context, massage, Toast.LENGTH_SHORT).show()
-    }
-
     override fun onDestroy() {
         filterLayout.visibility = View.GONE
         jobModel.life = false
         super.onDestroy()
     }
-
 
     private fun hideKeyboard() {
         val imm =
@@ -411,10 +390,10 @@ class HomeFragment : Fragment(), HomeInterface {
         if (applied){
             Toast.makeText(context, "You have already tried to apply this one if you want Reapply hold job", Toast.LENGTH_LONG).show()
         }else{
-            if (id in yourJoblist) {
+            if (id in jobModel.yourJoblist) {
                 itemClickOption(id)
             } else {
-                if(resume.isEmpty()){
+                if(jobModel.resume.isEmpty()){
                     Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
                 }else{
                     val intent = Intent(context, HolderActivity::class.java)
