@@ -1,6 +1,7 @@
 package com.gyanhub.finde_job.adapters
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.format.DateUtils
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.gyanhub.finde_job.R
@@ -28,7 +30,8 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
         val title :TextView = view.findViewById(R.id.cardTextTitle)
         val cy :TextView = view.findViewById(R.id.cardTxtCyName)
         val type :TextView = view.findViewById(R.id.cardTxtJobType)
-        val pay :TextView = view.findViewById(R.id.cardTxtPay)
+        val payT :TextView = view.findViewById(R.id.cardTxtPay)
+        val itemCard :CardView = view.findViewById(R.id.itemCard)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeViewHolder {
@@ -40,12 +43,24 @@ class HomeAdapter(private val context: Context, private val jobList: List<Job>, 
     override fun onBindViewHolder(holder: HomeViewHolder, position: Int) {
         val job = filteredList[position]
         if(job.jobId in yourJobList){
-            holder.itemView.background = ColorDrawable(R.drawable.ic_launcher_background)
+            val color = Color.parseColor("#AFE1B2")
+            holder.itemCard.backgroundTintList = ColorStateList.valueOf(color)
         }
-        holder.title.text = job.jobTitle
-        holder.cy.text = job.jobCyName
-        holder.type.text = job.jobType
-        holder.pay.text = postDate(job.timestamp)
+        if(job.jobId in appliedJobList){
+            val color = Color.parseColor("#E6DE94")
+            holder.itemCard.backgroundTintList = ColorStateList.valueOf(color)
+        }
+
+        holder.apply {
+            job.apply {
+                title.text = jobTitle
+                cy.text = context.getString(R.string.job_title_and_state,jobCyName,city,state)
+                type.text = context.getString(R.string.job_type_and_pay,jobType,pay)
+                payT.text = postDate(timestamp)
+            }
+        }
+
+
         holder.itemView.setOnClickListener {
             if (job.jobId in appliedJobList){
                 onClick.onClick(job.jobId,true)

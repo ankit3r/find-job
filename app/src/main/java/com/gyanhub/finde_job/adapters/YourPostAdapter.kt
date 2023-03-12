@@ -15,7 +15,7 @@ class YourPostAdapter(private val context: Context, private val yourPostJobList:
         fun bind(data: Job, click: YourJobClick) {
             binding.apply {
                 data.apply {
-                    txtTitleP.text = context.getString(R.string.job_title_and_state, jobTitle, state)
+                    txtTitleP.text = context.getString(R.string.job_title_and_state, jobTitle, city,state)
                     txtJobTypeP.text = context.getString(R.string.job_type_and_pay, jobType, pay)
                     txtTotalP.text = context.getString(R.string.job_total_applied,totalApplied.toString())
                 }

@@ -15,7 +15,7 @@ class AppliedAdapter(private val context:Context,private val appliedJobList: Lis
         fun bind(data: Job, click: AppliedClick) {
           binding.apply {
             data.apply {
-                txtTitleA.text = context.getString(R.string.job_title_and_state, jobTitle, state)
+                txtTitleA.text = context.getString(R.string.job_title_and_state, jobTitle, city,state)
                 txtJobTypeA.text = context.getString(R.string.job_type_and_pay, jobType, pay)
                 txtTotalA.text = context.getString(R.string.job_total_applied,totalApplied.toString())
             }
