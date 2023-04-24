@@ -8,86 +8,58 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
+import com.gyanhub.finde_job.model.Applicant
 import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 class DbRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private var jobCollection = firestore.collection("Job")
 
-    suspend fun postJob(
-        jobTitle: String,
-        jobCyName: String,
-        jobPostOpportunitity: String,
-        whNo: String,
-        jobDisc: String,
-        whoCanApply: String,
-        skils: List<String>,
-        pay: String,
-        filterPay: Int,
-        jobType: String,
-        state: String,
-        city: String,
-        callback: (Boolean, String) -> Unit
+    suspend fun postJob(jobTitle: String, jobCyName: String, jobPostOpportunitity: String,
+        whNo: String, jobDisc: String, whoCanApply: String, skils: List<String>, pay: String,
+        filterPay: Int, jobType: String, state: String, city: String, callback: (Boolean, String) -> Unit
     ) {
         val uid = firestore.collection("job").document().id
-
-        val job = Job(
-            uid,
-            jobTitle,
-            jobCyName,
-            jobPostOpportunitity,
-            whNo,
-            jobDisc,
-            whoCanApply,
-            skils,
-            pay,
-            filterPay,
-            jobType,
-            state,
-            city,
-            0,
-            Timestamp.now()
+        val job = Job(uid, jobTitle, jobCyName, jobPostOpportunitity,
+            whNo, jobDisc, whoCanApply, skils, pay, filterPay, jobType,
+            state, city, 0, Timestamp.now()
         )
-        jobCollection.document(uid)
-            .set(job)
-            .addOnCompleteListener { task ->
+        jobCollection.document(uid).set(job).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     firestore.collection("users").document(auth.currentUser!!.uid)
-                        .update(
-                            "job", FieldValue.arrayUnion(uid)
-                        ).addOnSuccessListener {
-                            callback(true, "")
-                        }
-                        .addOnFailureListener { e ->
-                            callback(false, e.message ?: "Unknown error occurred")
-                        }
-
-                } else {
-                    callback(false, task.exception?.message ?: "Unknown error occurred")
+                        .update("job", FieldValue.arrayUnion(uid)).addOnSuccessListener { callback(true, "") }
+                        .addOnFailureListener { e -> callback(false, e.message ?: "Unknown error occurred") }
                 }
+                else { callback(false, task.exception?.message ?: "Unknown error occurred") }
             }
     }
 
     suspend fun getAllJob(callback: (Boolean, List<Job>, String) -> Unit) {
         val jobLiveData = mutableListOf<Job>()
-        jobCollection
-            .orderBy("timestamp", Query.Direction.DESCENDING)
+        jobCollection.orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { jobs, error ->
-                if (error != null) {
-                    callback(false, jobLiveData, error.message ?: "Unknown error occurred")
+                if (!error?.message.isNullOrEmpty()) {
+                    callback(false, jobLiveData, error?.message ?: "Unknown error occurred")
                     return@addSnapshotListener
                 }
-                val job = mutableListOf<Job>()
+//                val job = mutableListOf<Job>()
                 for (j in jobs!!) {
                     val jo = j.toObject(Job::class.java)
-                    job.add(jo)
+                    jobLiveData.add(jo)
                 }
-                jobLiveData.addAll(job)
+//                jobLiveData.addAll(job)
                 callback(true, jobLiveData, "")
             }
     }
+
+
 
     suspend fun getYourJob(
         documentIds: List<String>,
@@ -237,10 +209,10 @@ class DbRepository {
                 firestore.collection("users").document(auth.currentUser!!.uid)
                     .update("job", FieldValue.arrayRemove(id))
                     .addOnSuccessListener {
-                       callBack(true,"")
+                        callBack(true, "")
                     }
                     .addOnFailureListener { exception ->
-                      callBack(false,exception.message.toString())
+                        callBack(false, exception.message.toString())
                     }
 
             }
@@ -249,7 +221,7 @@ class DbRepository {
             }
     }
 
-    fun appliedJob(id:String,callback: (Boolean, String) -> Unit){
+    fun appliedJob(id: String, callback: (Boolean, String) -> Unit) {
         jobCollection.document(id)
             .update("totalApplied", FieldValue.increment(1))
             .addOnSuccessListener {
@@ -266,8 +238,58 @@ class DbRepository {
             }
             .addOnFailureListener { e ->
                 callback(false, e.message ?: "Not applied")
-              Log.e("ANKIT",e.message.toString())
+                Log.e("ANKIT", e.message.toString())
             }
+    }
+
+    suspend fun viewPdf(url: String): InputStream {
+        return withContext(Dispatchers.IO) {
+            val connection = URL(url).openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connect()
+            connection.inputStream
+        }
+    }
+
+    fun appliedForJob(uid:String,jobId: String, user: User, callback: (Boolean, String) -> Unit) {
+        val jobRef = jobCollection.document(jobId)
+        val applicantRef = jobRef.collection("Applicant")
+        applicantRef.document(uid).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val document = task.result
+                if (document != null && document.exists()) {
+                    callback(false, "You Already Applied")
+                } else {
+                    val applicant = Applicant(uid,user.name,user.resume,user.phNo,user.email,Timestamp.now())
+                    applicantRef.document(uid).set(applicant).addOnCompleteListener{
+                        if (it.isSuccessful) callback(true,"") else callback(false,it.exception?.message.toString())
+                    }
+                }
+            } else {
+                callback(false, task.exception?.message.toString())
+            }
+        }
+    }
+
+    fun getAllApplicant(jobId: String, callback: (Boolean, List<Applicant>, String) -> Unit) {
+        val applicantLiveData = mutableListOf<Applicant>()
+        val jobRef = jobCollection.document(jobId)
+        jobRef.collection("Applicant").orderBy("appliedDateTime", Query.Direction.DESCENDING)
+            .addSnapshotListener { applicant, error ->
+                if (!error?.message.isNullOrEmpty()) {
+                    callback(false, emptyList(), error?.message.toString())
+                    return@addSnapshotListener
+                }
+               if (applicant != null){
+                   for(data in applicant){
+                       applicantLiveData.add(data.toObject(Applicant::class.java))
+                   }
+                   callback(true,applicantLiveData,"")
+               }else{
+                   callback(false, emptyList(),"No one Applied yet.")
+               }
+            }
+
     }
 
 

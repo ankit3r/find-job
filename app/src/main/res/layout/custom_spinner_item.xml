@@ -1,8 +1,6 @@
-
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/spinner_item_text"
+    style="@style/spineerTextStyle_16sp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textAlignment="center"
-    style="@style/textStyle_16sp"/>
+    android:textAlignment="center" />

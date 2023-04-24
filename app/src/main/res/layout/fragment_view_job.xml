@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_below="@id/txtPay"
-                android:background="@color/black" />
+                android:background="@color/white" />
 
             <TextView
                 style="@style/textStyle_20sp_bold"
@@ -76,7 +76,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_below="@id/txtOpportunities"
-                android:layout_marginTop="1dp" />
+                android:layout_marginTop="1dp"
+                android:background="@color/white" />
 
             <TextView
                 style="@style/textStyle_20sp_bold"
@@ -98,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_below="@id/txtSkill"
-                android:background="@color/black" />
+                android:background="@color/white" />
 
             <TextView
                 style="@style/textStyle_20sp_bold"

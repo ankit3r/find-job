@@ -16,18 +16,21 @@ import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.HolderActivity
+import com.gyanhub.finde_job.activity.comp.CheckPhoNo.Companion.isValidMobileNumber
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
 import com.gyanhub.finde_job.adapters.YourPostAdapter
 import com.gyanhub.finde_job.adapters.onClickInterface.YourJobClick
 import com.gyanhub.finde_job.databinding.FragmentYourPostBinding
 import com.gyanhub.finde_job.databinding.PostJobBottomBinding
 import com.gyanhub.finde_job.model.State
+import com.gyanhub.finde_job.utils.UserResult
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 
 
 class YourPostFragment : Fragment(), YourJobClick {
-    private lateinit var binding: FragmentYourPostBinding
+    private var _binding: FragmentYourPostBinding? = null
+    private val binding get() = _binding!!
     private lateinit var dbModel: DbViewModel
     private lateinit var bottomBinding: PostJobBottomBinding
     private lateinit var bottomSheetDialog: BottomSheetDialog
@@ -36,6 +39,7 @@ class YourPostFragment : Fragment(), YourJobClick {
     private lateinit var list: List<String>
     private lateinit var jobType: String
     private lateinit var state: String
+    private lateinit var adapter: YourPostAdapter
 
 
     override fun onCreateView(
@@ -43,49 +47,26 @@ class YourPostFragment : Fragment(), YourJobClick {
         savedInstanceState: Bundle?
     ): View {
 
-        binding = FragmentYourPostBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentYourPostBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         authModel = ViewModelProvider(this)[AuthViewModel::class.java]
-        progressBar()
         list = listOf()
-
-        dbModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
-            if (visible) progressBar.show() else progressBar.dismiss()
-        }
-        dbModel.showProgressBar()
-        authModel.getUser { success, user, _ ->
-            if (success && !user?.job.isNullOrEmpty()) {
-                dbModel.getYourJobs(user!!.job) { s, e ->
-                    if (s) {
-                        if (dbModel.life) {
-                            dbModel.yourJob.observe(viewLifecycleOwner) {
-                                binding.rcYourPost.adapter = YourPostAdapter(requireContext(),it,this)
-                                binding.textView.visibility = View.GONE
-                                dbModel.hideProgressBar()
-
-                            }
-                        }
-                    } else {
-                        binding.textView.visibility = View.VISIBLE
-                        binding.textView.text = e
-                        dbModel.hideProgressBar()
-                    }
-                }
-            } else  dbModel.hideProgressBar()
-        }
+        getYourPost()
 
         binding.btnPostJob.setOnClickListener {
             bottomSheet()
         }
-        return binding.root
     }
 
     private fun bottomSheet() {
 
         val spinnerItems = mutableListOf<State>()
-        val jsonString =
-            context?.assets?.open("States.json")?.bufferedReader().use { it?.readText() }
-
+        val jsonString = context?.assets?.open("States.json")?.bufferedReader().use { it?.readText() }
         val itemType = object : TypeToken<List<State>>() {}.type
         spinnerItems.addAll(Gson().fromJson(jsonString, itemType))
 
@@ -114,15 +95,14 @@ class YourPostFragment : Fragment(), YourJobClick {
             if (!checkFiled(bottomBinding.eTxtSkill)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtWCA)) return@setOnClickListener
             if (!checkFiled(bottomBinding.eTxtWhNo)) return@setOnClickListener
-            else {
-                val isValid = isValidMobileNumber(bottomBinding.eTxtWhNo.text.toString())
+            else { val isValid = isValidMobileNumber(bottomBinding.eTxtWhNo.text.toString())
                 if (!isValid) {
                     bottomBinding.eTxtWhNo.error = "Invalid Mobile No"
                     return@setOnClickListener
                 }
             }
             //  converting skill into list
-            dbModel.showProgressBar()
+
             val skillList = mutableListOf<String>()
             val tags = bottomBinding.eTxtSkill.text.toString().split(Regex("\\s*,\\s*"))
             for (tag in tags) {
@@ -146,14 +126,12 @@ class YourPostFragment : Fragment(), YourJobClick {
                 bottomBinding.eTxtxCity.text.toString()
             ) { success, error ->
                 if (success) {
+                    getYourPost()
                     bottomSheetDialog.dismiss()
-                    dbModel.hideProgressBar()
-
                 } else {
                     Log.d("ANKIT", "Error $error")
-                    dbModel.hideProgressBar()
-                }
 
+                }
             }
         }
         bottomSheetDialog.show()
@@ -176,7 +154,6 @@ class YourPostFragment : Fragment(), YourJobClick {
                 callback(false, "")
             }
         }
-
     }
 
     private fun checkFiled(view: EditText): Boolean {
@@ -187,26 +164,10 @@ class YourPostFragment : Fragment(), YourJobClick {
         return true
     }
 
-    private fun progressBar() {
-        val builder = AlertDialog.Builder(context)
-        val inflater = layoutInflater
-        val view = inflater.inflate(R.layout.custome_progress_bar, null)
-        builder.setView(view)
-        builder.setCancelable(false)
-        progressBar = builder.create()
-
-    }
-
     override fun onDestroy() {
         dbModel.life = false
         super.onDestroy()
     }
-
-    private fun isValidMobileNumber(mobileNumber: String): Boolean {
-        val regex = Regex("^[6-9]\\d{9}\$")
-        return regex.matches(mobileNumber)
-    }
-
 
     private fun deleteItemOption(id: String) {
         val builder = AlertDialog.Builder(context)
@@ -217,6 +178,7 @@ class YourPostFragment : Fragment(), YourJobClick {
             dbModel.showProgressBar()
             dbModel.deleteJob(id) { success, _ ->
                 if (success) {
+                    getYourPost()
                     dbModel.hideProgressBar()
                     Toast.makeText(context, "Item delete ", Toast.LENGTH_SHORT).show()
                 } else {
@@ -246,5 +208,39 @@ class YourPostFragment : Fragment(), YourJobClick {
         deleteItemOption(id)
     }
 
+    override fun viewApplicant(id: String) {
+        val intent = Intent(context, HolderActivity::class.java)
+        intent.putExtra("f", 4)
+        intent.putExtra("id", id)
+        requireActivity().startActivity(intent)
+    }
 
+    private fun getYourPost() {
+        dbModel.showProgressBar()
+        val user = authModel.getUser(requireActivity())
+        user.observe(viewLifecycleOwner) { u ->
+            when (u) {
+                is UserResult.Success -> {
+                    dbModel.getYourJobs(u.user.job) { s, e ->
+                        if (s) {
+                            if (dbModel.life) {
+                                adapter = YourPostAdapter(requireContext(), dbModel.yourJob, this)
+                                binding.rcYourPost.adapter = adapter
+                                binding.textView.visibility = View.GONE
+                                dbModel.hideProgressBar()
+                            }
+                        } else {
+                            binding.textView.visibility = View.VISIBLE
+                            binding.textView.text = e
+                            dbModel.hideProgressBar()
+                        }
+                    }
+                }
+                is UserResult.Error -> {
+                    Toast.makeText(requireContext(), "User Data Error", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
 }

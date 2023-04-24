@@ -15,12 +15,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.MainActivity
+import com.gyanhub.finde_job.activity.comp.CheckPhoNo.Companion.isValidMobileNumber
 import com.gyanhub.finde_job.databinding.FragmentSignUpBinding
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 
-
 class SignUpFragment : Fragment() {
-    private lateinit var binding: FragmentSignUpBinding
+    private var _binding: FragmentSignUpBinding? = null
+    private val binding get() = _binding!!
     private lateinit var viewModel: AuthViewModel
     private lateinit var imm: InputMethodManager
     private lateinit var dialog : AlertDialog
@@ -29,7 +30,12 @@ class SignUpFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSignUpBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentSignUpBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         hideKeyBoard(binding.eTxtNameUp)
@@ -44,9 +50,6 @@ class SignUpFragment : Fragment() {
         binding.btnSignUp.setOnClickListener {
             checkFiled(it)
         }
-
-
-        return binding.root
     }
 
     private fun checkFiled(view: View) {
@@ -113,8 +116,5 @@ class SignUpFragment : Fragment() {
         dialog = builder.create()
         dialog.show()
     }
-    fun isValidMobileNumber(mobileNumber: String): Boolean {
-        val regex = Regex("^[6-9]\\d{9}\$")
-        return regex.matches(mobileNumber)
-    }
+
 }

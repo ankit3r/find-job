@@ -14,65 +14,68 @@ import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.adapters.AppliedAdapter
 import com.gyanhub.finde_job.adapters.onClickInterface.AppliedClick
 import com.gyanhub.finde_job.databinding.FragmentAppliedBinding
+import com.gyanhub.finde_job.utils.UserResult
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 
 class AppliedFragment : Fragment(), AppliedClick {
-    private lateinit var binding: FragmentAppliedBinding
+
+    private var _binding: FragmentAppliedBinding? = null
+    private val binding get() = _binding!!
     private lateinit var jobModel: DbViewModel
     private lateinit var authModel: AuthViewModel
-    private lateinit var progressBar: AlertDialog
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAppliedBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentAppliedBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         jobModel = ViewModelProvider(this)[DbViewModel::class.java]
         authModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
-        progressBar()
+        // progress bar
         if (jobModel.life) {
-            jobModel.showProgressBar()
-            jobModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
-                if (visible) progressBar.show() else progressBar.dismiss()
+            val user = authModel.getUser(requireActivity())
+            user.observe(viewLifecycleOwner) { u ->
+                when (u) {
+                    is UserResult.Success -> {
+                        if (u.user.youApply.isNotEmpty()){
+                            binding.txtMessage.visibility = View.GONE
+                            jobModel.getYourJobs(u.user.youApply) { s, _ ->
+                                if (s) {
+                                    jobModel.yourJob.observe(viewLifecycleOwner) {
+                                        binding.rcApplied.adapter =
+                                            AppliedAdapter(requireContext(), it, this)
+                                        // progress bar hide
+                                    }
+                                } else
+                                // progress bar hide
+                                    true
+                            }
+                        }else {
+                            binding.txtMessage.visibility = View.VISIBLE
+                            if (isAdded)
+                                binding.txtMessage.text = getString(R.string.error_massage)
+                        }
+                    }
+                    is UserResult.Error -> {
+                        Toast.makeText(requireContext(), "User Data Error", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
             }
-            authModel.getUser { success, user, _ ->
-                if (success && user != null) {
-                  if (user.youApply.isNotEmpty()){
-                      binding.txtMessage.visibility = View.GONE
-                      jobModel.getYourJobs(user.youApply) { s, _ ->
-                          if (s) {
-                              jobModel.yourJob.observe(viewLifecycleOwner) {
-                                  binding.rcApplied.adapter = AppliedAdapter(requireContext(), it, this)
-                                  jobModel.hideProgressBar()
-                              }
-                          }else
-                              jobModel.hideProgressBar()
-                      }
-                  }else {
-                      jobModel.hideProgressBar()
-                      binding.txtMessage.visibility = View.VISIBLE
-                    binding.txtMessage.text = getString(R.string.error_massage)
-                  }
-                }else
-                    jobModel.hideProgressBar()
-            }
-        }
 
-        return binding.root
+
+        }
     }
 
     override fun onDestroy() {
         jobModel.life = false
         super.onDestroy()
-    }
-    private fun progressBar() {
-        val builder = AlertDialog.Builder(context)
-        val inflater = layoutInflater
-        val view = inflater.inflate(R.layout.custome_progress_bar, null)
-        builder.setView(view)
-        builder.setCancelable(false)
-        progressBar = builder.create()
-
     }
 
 

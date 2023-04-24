@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">find job</string>
+    <string name="app_name">Get a Job</string>
     <string name="login">login</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -44,4 +44,14 @@
     <string name="view_full_details">view full details</string>
     <string name="delete">Delete</string>
     <string name="error_massage">You Haven\'t applied any Job</string>
+    <string name="reapply">Reapply</string>
+    <string name="update">update</string>
+    <string name="view_resume">View Resume</string>
+    <string name="download">Download</string>
+    <string name="forgot_password">Forgot Password ?</string>
+    <string name="passError">The password is invalid or the user does not have a password.</string>
+    <string name="save_phone_number">Save Phone Number</string>
+    <string name="save_you_phone_no">Save you phone No</string>
+    <string name="no_applicant">No one applied yet.</string>
+    <string name="close_pdfview">close pdfView</string>
 </resources>

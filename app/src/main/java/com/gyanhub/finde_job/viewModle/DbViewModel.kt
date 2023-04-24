@@ -1,13 +1,18 @@
 package com.gyanhub.finde_job.viewModle
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gyanhub.finde_job.activity.comp.LoaderClass
 import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.User
 import com.gyanhub.finde_job.repository.DbRepository
+import com.gyanhub.finde_job.utils.ApplicantViewResult
 import kotlinx.coroutines.launch
+import java.io.InputStream
 
 class DbViewModel : ViewModel() {
 
@@ -33,7 +38,7 @@ class DbViewModel : ViewModel() {
     val stateField = "state"
     val typeField = "jobType"
     var phNo = ""
-    var resume :String = ""
+    var resume: String = ""
     var list: List<Job> = listOf()
     var yourJoblist: List<String> = listOf()
     var appliedJobList: List<String> = listOf()
@@ -94,10 +99,8 @@ class DbViewModel : ViewModel() {
 
     fun getAllJob() {
         viewModelScope.launch {
-            jobRepository.getAllJob { b, liveData, s ->
-                if (b) {
-                    data.postValue(liveData)
-                }
+            jobRepository.getAllJob { b, liveData, _ ->
+                if (b) data.postValue(liveData)
             }
         }
     }
@@ -143,9 +146,7 @@ class DbViewModel : ViewModel() {
     }
 
     fun doubleValueFilter(
-        pay: Int,
-        value: String,
-        filedName: String,
+        pay: Int, value: String, filedName: String,
         callback: (Boolean, List<Job>, String) -> Unit
     ) {
         jobRepository.filterByDoubleValue(pay, value, filedName, callback)
@@ -163,7 +164,48 @@ class DbViewModel : ViewModel() {
         jobRepository.appliedJob(id, callback)
     }
 
-    init {
-        getAllJob()
+    suspend fun viewPdf(url: String): InputStream {
+        return jobRepository.viewPdf(url)
     }
+
+    fun appliedForJob(uid: String, jobId: String, user: User, context: Context): Boolean {
+        var success = false
+        val loader = LoaderClass(context)
+        loader.loading("Sending data...")
+        loader.showLoder()
+        jobRepository.appliedForJob(uid,jobId, user) { s, e ->
+            if (s) {
+                loader.hideLoder()
+                toastMessage(context, "Done. next Send message on whatsapp")
+                success = true
+            } else {
+                loader.hideLoder()
+                toastMessage(context, e)
+                success = false
+            }
+        }
+        return success
+    }
+
+    fun viewApplicantList(jobId:String,context: Context):LiveData<ApplicantViewResult>{
+        val loader = LoaderClass(context)
+        loader.loading("Loading data...")
+        loader.showLoder()
+        val applicantLiveData = MutableLiveData<ApplicantViewResult>()
+        jobRepository.getAllApplicant(jobId){s,applicant,e->
+            if (s) {
+                applicantLiveData.value = ApplicantViewResult.Success(applicant)
+                loader.hideLoder()
+            } else {
+                applicantLiveData.value = ApplicantViewResult.Error(e)
+                loader.hideLoder()
+            }
+        }
+        return applicantLiveData
+    }
+
+    private fun toastMessage(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
 }

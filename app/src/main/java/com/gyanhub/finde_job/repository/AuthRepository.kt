@@ -1,7 +1,5 @@
 package com.gyanhub.finde_job.repository
 
-
-
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,21 +12,17 @@ class AuthRepository {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
-
-
     fun registerUser(
         email: String,
         password: String,
         name: String,
         ph: String,
-
         callback: (Boolean, String) -> Unit
     ) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val user =
-                        User(name, email, firebaseAuth.uid.toString(), ph, "", listOf(), listOf())
+                    val user = User(name, email, firebaseAuth.uid.toString(), ph, "", listOf(), listOf(), UUID.randomUUID().toString())
                     firestore.collection("users").document(firebaseAuth.currentUser!!.uid)
                         .set(user)
                         .addOnCompleteListener { tasks ->
@@ -60,10 +54,6 @@ class AuthRepository {
 
     fun logoutUser() {
         firebaseAuth.signOut()
-    }
-
-    fun isUserLoggedIn(): Boolean {
-        return firebaseAuth.currentUser != null
     }
 
     fun getUserData(callback: (Boolean, User?, String) -> Unit) {
@@ -109,5 +99,13 @@ class AuthRepository {
             }
 
     }
-
+    fun updatePhNo(no:String,callback: (Boolean, String) -> Unit){
+        val currentUser = firebaseAuth.currentUser
+        val userId = currentUser?.uid
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("users").document(userId!!)
+        docRef.update("phNo", no)
+            .addOnSuccessListener { callback(true,"") }
+            .addOnFailureListener { e -> callback(false,"$e") }
+    }
 }

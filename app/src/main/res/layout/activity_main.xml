@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -31,15 +30,15 @@
                     android:id="@+id/layout_btnFilter1"
                     style="@style/cardStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/white">
+                    android:layout_height="wrap_content">
 
                     <Spinner
                         android:id="@+id/btnFilter1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/black"
-                        android:minWidth="100dp" />
+                        android:minWidth="100dp"
+                        android:minHeight="25dp" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -47,8 +46,7 @@
                     style="@style/cardStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/layout_btnFilter1"
-                    android:backgroundTint="@color/white">
+                    android:layout_toEndOf="@id/layout_btnFilter1">
 
                     <Spinner
                         android:id="@+id/btnFilter2"
@@ -63,8 +61,7 @@
                     style="@style/cardStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/layout_btnFilter2"
-                    android:backgroundTint="@color/white">
+                    android:layout_toEndOf="@id/layout_btnFilter2">
 
                     <Spinner
                         android:id="@+id/btnFilter3"
@@ -116,7 +113,8 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_bottom_bar"
+        style="@style/bottomBar"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

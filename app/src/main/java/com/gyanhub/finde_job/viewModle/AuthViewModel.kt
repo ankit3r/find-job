@@ -1,15 +1,17 @@
 package com.gyanhub.finde_job.viewModle
 
+import android.content.Context
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
+import com.gyanhub.finde_job.activity.comp.LoaderClass
 import com.gyanhub.finde_job.fragments.LoginFragment
-import com.gyanhub.finde_job.model.User
 import com.gyanhub.finde_job.repository.AuthRepository
-import java.util.*
+import com.gyanhub.finde_job.utils.UserResult
 
 class AuthViewModel : ViewModel() {
     var fragment: Fragment = LoginFragment()
@@ -23,7 +25,7 @@ class AuthViewModel : ViewModel() {
         ph: String,
         callback: (Boolean, String) -> Unit
     ) {
-        authRepository.registerUser(email, password, name,ph, callback)
+        authRepository.registerUser(email, password, name, ph, callback)
     }
 
     fun loginUser(email: String, password: String, callback: (Boolean, String) -> Unit) {
@@ -34,18 +36,44 @@ class AuthViewModel : ViewModel() {
         authRepository.logoutUser()
     }
 
-    fun isLogin(): Boolean {
-        return authRepository.isUserLoggedIn()
+
+    fun getUser(context: Context): LiveData<UserResult> {
+        val userResult = MutableLiveData<UserResult>()
+        val loaderClass = LoaderClass(context)
+        Log.d("ANKIT","user data")
+        loaderClass.loading("Loading")
+        loaderClass.showLoder()
+        authRepository.getUserData { b, u, e ->
+            if (b) {
+                if (u != null) userResult.value = UserResult.Success(u)
+                else userResult.value = UserResult.Error("Null")
+                loaderClass.hideLoder()
+            } else {
+                userResult.value = UserResult.Error(e)
+                loaderClass.hideLoder()
+            }
+        }
+        return userResult
     }
 
-    fun getUser(callback: (Boolean, User?, String) -> Unit){
-        authRepository.getUserData(callback)
-    }
-
-    fun uploadResume(fileUri: Uri, callback: (Boolean, String,String) -> Unit){
-        authRepository.uploadResume(fileUri,callback)
+    fun uploadResume(fileUri: Uri, callback: (Boolean, String, String) -> Unit) {
+        authRepository.uploadResume(fileUri, callback)
     }
 
 
+    fun updatePhNo(no: String, context: Context) {
+        val loading = LoaderClass(context)
+        loading.loading("Saving Data")
+        loading.showLoder()
+        authRepository.updatePhNo(no) { s, e ->
+            if (s) {
+                loading.hideLoder()
+                Toast.makeText(context, "Updated...", Toast.LENGTH_SHORT).show()
+            } else {
+                loading.hideLoder()
+                Toast.makeText(context, "Updating failed...", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
 }

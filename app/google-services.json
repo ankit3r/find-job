@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "751172151900-9q7l9t66alvus5spnvsktts1fik5ik7p.apps.googleusercontent.com",
+          "client_id": "751172151900-lk03hcpd7471muaje2aqm52ura1k76o6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gyanhub.finde_job",
+            "certificate_hash": "e7f6f5a3c990e5aeda74036157d0a12cf68cc61e"
+          }
+        },
+        {
+          "client_id": "751172151900-h489nhu6m2t3n14tb0nqc3p4as07cp52.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

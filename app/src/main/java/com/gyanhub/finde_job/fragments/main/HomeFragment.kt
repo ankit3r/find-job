@@ -1,13 +1,16 @@
 package com.gyanhub.finde_job.fragments.main
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
+import android.widget.Button
+import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.Toast
@@ -16,20 +19,24 @@ import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.common.reflect.TypeToken
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.HolderActivity
+import com.gyanhub.finde_job.activity.comp.CheckPhoNo.Companion.isValidMobileNumber
 import com.gyanhub.finde_job.activity.comp.CustomSpinner
-import com.gyanhub.finde_job.adapters.HomeAdapter
+import com.gyanhub.finde_job.adapters.AdapterForHome
 import com.gyanhub.finde_job.adapters.onClickInterface.HomeInterface
 import com.gyanhub.finde_job.databinding.FragmentHomeBinding
 import com.gyanhub.finde_job.model.State
+import com.gyanhub.finde_job.utils.UserResult
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
 import com.gyanhub.finde_job.viewModle.MainViewModel
 
 class HomeFragment : Fragment(), HomeInterface {
-    private lateinit var binding: FragmentHomeBinding
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     private lateinit var filterLayout: RelativeLayout
     private lateinit var filter: CardView
     private lateinit var filter1: Spinner
@@ -39,50 +46,82 @@ class HomeFragment : Fragment(), HomeInterface {
     private lateinit var jobModel: DbViewModel
     private lateinit var mainModel: MainViewModel
     private lateinit var authModel: AuthViewModel
-    private lateinit var adapter: HomeAdapter
-    private lateinit var progressBar: AlertDialog
+    private lateinit var adapter: AdapterForHome
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+        jobModel = ViewModelProvider(this)[DbViewModel::class.java]
+        mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
+        authModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
+        jobModel.getAllJob()
+        adapter = AdapterForHome(
+            requireContext(),
+            jobModel.getJob,
+            jobModel.yourJoblist,
+            jobModel.appliedJobList,
+            this
+        )
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         filterLayout = requireActivity().findViewById(R.id.filterLayout)
         filter = requireActivity().findViewById(R.id.fllterBtn)
         filter1 = requireActivity().findViewById(R.id.btnFilter1)
         filter2 = requireActivity().findViewById(R.id.btnFilter2)
         filter3 = requireActivity().findViewById(R.id.btnFilter3)
-        jobModel = ViewModelProvider(this)[DbViewModel::class.java]
-        mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
-        authModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
-        progressBar()
-        jobModel.showProgressBar()
-        if (jobModel.life) {
-            jobModel.progressBarVisible.observe(viewLifecycleOwner) { visible ->
-                if (visible) progressBar.show() else progressBar.dismiss()
-            }
-            authModel.getUser { b, user, _ ->
-                if (b && user != null) {
-                    jobModel.yourJoblist = user.job
-                    jobModel.appliedJobList = user.youApply
-                    jobModel.resume = user.resume
-                   if (jobModel.life){
-                       jobModel.getJob.observe(viewLifecycleOwner) {
-                           jobModel.list = it
-                           adapter = HomeAdapter(requireContext(), jobModel.list, user.job,jobModel.appliedJobList, this)
-                           binding.rcJob.adapter = adapter
-                           jobModel.hideProgressBar()
-                       }
-                   }
+
+
+        val user = authModel.getUser(requireActivity())
+        user.observe(viewLifecycleOwner) { u ->
+            when (u) {
+                is UserResult.Success -> {
+                    val data = u.user
+                    jobModel.yourJoblist = data.job
+                    jobModel.appliedJobList = data.youApply
+                    jobModel.resume = data.resume
+                    if (u.user.phNo.isEmpty())
+                        phoneNoDialog()
+                }
+
+                is UserResult.Error -> {
+                    Toast.makeText(requireContext(), "User Data Error", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
-        adapter = HomeAdapter(requireContext(),jobModel.list, jobModel.yourJoblist, jobModel.appliedJobList,this)
+
+        jobModel.getJob.observe(viewLifecycleOwner) {
+            jobModel.list = it
+            adapter = AdapterForHome(
+                requireContext(),
+                jobModel.getJob,
+                jobModel.yourJoblist,
+                jobModel.appliedJobList,
+                this
+            )
+            binding.rcJob.adapter = adapter
+
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = true
+            adapter.setData(jobModel.getJob)
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
+//        adapter = AdapterForHome(
+//            requireContext(),
+//            jobModel.getJob,
+//            jobModel.yourJoblist,
+//            jobModel.appliedJobList,
+//            this
+//        )
         setUpDropDownFilter()
         filter.setOnClickListener {
-            jobModel.showProgressBar()
             if (mainModel.filterByJobType != "All"
                 && mainModel.filterByPay != "All"
                 && mainModel.filterByState != "All"
@@ -95,11 +134,8 @@ class HomeFragment : Fragment(), HomeInterface {
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
-                        adapter.notifyDataSetChanged()
-                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        jobModel.hideProgressBar()
                     }
                 }
             } else if (
@@ -115,11 +151,8 @@ class HomeFragment : Fragment(), HomeInterface {
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
-                        adapter.notifyDataSetChanged()
-                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        jobModel.hideProgressBar()
                     }
                 }
             } else if (
@@ -136,11 +169,8 @@ class HomeFragment : Fragment(), HomeInterface {
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
-                        adapter.notifyDataSetChanged()
-                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        jobModel.hideProgressBar()
                     }
                 }
             } else if (
@@ -158,11 +188,8 @@ class HomeFragment : Fragment(), HomeInterface {
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
-                        adapter.notifyDataSetChanged()
-                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        jobModel.hideProgressBar()
                     }
                 }
             } else if (
@@ -170,10 +197,7 @@ class HomeFragment : Fragment(), HomeInterface {
                 && mainModel.filterByPay == "All"
                 && mainModel.filterByState == "All"
             ) {
-
                 jobModel.getAllJob()
-                adapter.notifyDataSetChanged()
-                jobModel.hideProgressBar()
             } else if (mainModel.filterByJobType != "All") {
 
                 jobModel.singlFieldFilter(
@@ -183,15 +207,11 @@ class HomeFragment : Fragment(), HomeInterface {
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
-                        adapter.notifyDataSetChanged()
-                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        jobModel.hideProgressBar()
                     }
                 }
             } else if (mainModel.filterByPay != "All") {
-
                 jobModel.filterPay(
                     jobModel.payField,
                     mainModel.filterByPay.toInt()
@@ -199,11 +219,8 @@ class HomeFragment : Fragment(), HomeInterface {
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
-                        adapter.notifyDataSetChanged()
-                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        jobModel.hideProgressBar()
                     }
                 }
             } else if (this.mainModel.filterByState != "All") {
@@ -214,16 +231,12 @@ class HomeFragment : Fragment(), HomeInterface {
                     if (success) {
                         jobModel.data.postValue(data)
                         Toast.makeText(context, "filtered", Toast.LENGTH_SHORT).show()
-                        adapter.notifyDataSetChanged()
-                        jobModel.hideProgressBar()
                     } else {
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        jobModel.hideProgressBar()
                     }
                 }
             }
         }
-        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -260,16 +273,6 @@ class HomeFragment : Fragment(), HomeInterface {
             else -> return super.onOptionsItemSelected(item)
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun progressBar() {
-        val builder = AlertDialog.Builder(context)
-        val inflater = layoutInflater
-        val view = inflater.inflate(R.layout.custome_progress_bar, null)
-        builder.setView(view)
-        builder.setCancelable(false)
-        progressBar = builder.create()
-
     }
 
     private fun setUpDropDownFilter() {
@@ -325,6 +328,12 @@ class HomeFragment : Fragment(), HomeInterface {
         filterLayout.visibility = View.GONE
         jobModel.life = false
         super.onDestroy()
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun hideKeyboard() {
@@ -365,14 +374,12 @@ class HomeFragment : Fragment(), HomeInterface {
         builder.setMessage("Are you sure you want to delete this Job?")
         builder.setCancelable(false)
         builder.setPositiveButton("Yes") { dialogs, _ ->
-            jobModel.showProgressBar()
             jobModel.deleteJob(id) { success, _ ->
                 if (success) {
-                    jobModel.hideProgressBar()
-                    Toast.makeText(context, "Item delete ", Toast.LENGTH_SHORT).show()
+                    jobModel.getAllJob()
+                    adapter.setData(jobModel.getJob)
                 } else {
                     Toast.makeText(context, "Item deleting failed", Toast.LENGTH_SHORT).show()
-                    jobModel.hideProgressBar()
                 }
 
             }
@@ -387,15 +394,19 @@ class HomeFragment : Fragment(), HomeInterface {
     }
 
     override fun onClick(id: String, applied: Boolean) {
-        if (applied){
-            Toast.makeText(context, "You have already tried to apply this one if you want Reapply hold job", Toast.LENGTH_LONG).show()
-        }else{
+        if (applied) {
+            Toast.makeText(
+                context,
+                "You have already tried to apply this one if you want Reapply hold job",
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
             if (id in jobModel.yourJoblist) {
                 itemClickOption(id)
             } else {
-                if(jobModel.resume.isEmpty()){
+                if (jobModel.resume.isEmpty()) {
                     Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
-                }else{
+                } else {
                     val intent = Intent(context, HolderActivity::class.java)
                     intent.putExtra("f", 0)
                     intent.putExtra("id", id)
@@ -411,5 +422,22 @@ class HomeFragment : Fragment(), HomeInterface {
         intent.putExtra("id", id)
         requireActivity().startActivity(intent)
     }
+
+    private fun phoneNoDialog() {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_update_phone, null)
+        val dialogInput = dialogView.findViewById<EditText>(R.id.editTextNewPhone)
+        val dialogOkButton = dialogView.findViewById<Button>(R.id.buttonUpdatePhone)
+        val dialog = AlertDialog.Builder(context).setView(dialogView).create()
+        dialog.setCancelable(false)
+        dialogOkButton.setOnClickListener {
+            val newPhoneNumber = dialogInput.text.toString()
+            if (isValidMobileNumber(newPhoneNumber)) {
+                authModel.updatePhNo(newPhoneNumber, requireContext())
+            } else dialogInput.error = "Invalid Mobile No"
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
 
 }
