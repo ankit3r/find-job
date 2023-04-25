@@ -2,11 +2,11 @@ package com.gyanhub.finde_job.fragments.main
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.Button
@@ -19,7 +19,6 @@ import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.common.reflect.TypeToken
-import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.HolderActivity
@@ -47,25 +46,25 @@ class HomeFragment : Fragment(), HomeInterface {
     private lateinit var mainModel: MainViewModel
     private lateinit var authModel: AuthViewModel
     private lateinit var adapter: AdapterForHome
+    private lateinit var dialog :AlertDialog
+
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         jobModel = ViewModelProvider(this)[DbViewModel::class.java]
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         authModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
-        jobModel.getAllJob()
-        adapter = AdapterForHome(
-            requireContext(),
-            jobModel.getJob,
-            jobModel.yourJoblist,
-            jobModel.appliedJobList,
-            this
+        adapter = AdapterForHome(requireContext(), jobModel.getJob, jobModel.yourJoblist,
+            jobModel.appliedJobList, this
         )
+        dialog = AlertDialog.Builder(context).create()
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -75,51 +74,12 @@ class HomeFragment : Fragment(), HomeInterface {
         filter1 = requireActivity().findViewById(R.id.btnFilter1)
         filter2 = requireActivity().findViewById(R.id.btnFilter2)
         filter3 = requireActivity().findViewById(R.id.btnFilter3)
-
-
-        val user = authModel.getUser(requireActivity())
-        user.observe(viewLifecycleOwner) { u ->
-            when (u) {
-                is UserResult.Success -> {
-                    val data = u.user
-                    jobModel.yourJoblist = data.job
-                    jobModel.appliedJobList = data.youApply
-                    jobModel.resume = data.resume
-                    if (u.user.phNo.isEmpty())
-                        phoneNoDialog()
-                }
-
-                is UserResult.Error -> {
-                    Toast.makeText(requireContext(), "User Data Error", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        }
-
-        jobModel.getJob.observe(viewLifecycleOwner) {
-            jobModel.list = it
-            adapter = AdapterForHome(
-                requireContext(),
-                jobModel.getJob,
-                jobModel.yourJoblist,
-                jobModel.appliedJobList,
-                this
-            )
-            binding.rcJob.adapter = adapter
-
-        }
+        setRecyclear()
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.swipeRefreshLayout.isRefreshing = true
-            adapter.setData(jobModel.getJob)
+            setRecyclear()
             binding.swipeRefreshLayout.isRefreshing = false
         }
-//        adapter = AdapterForHome(
-//            requireContext(),
-//            jobModel.getJob,
-//            jobModel.yourJoblist,
-//            jobModel.appliedJobList,
-//            this
-//        )
         setUpDropDownFilter()
         filter.setOnClickListener {
             if (mainModel.filterByJobType != "All"
@@ -395,25 +355,13 @@ class HomeFragment : Fragment(), HomeInterface {
 
     override fun onClick(id: String, applied: Boolean) {
         if (applied) {
-            Toast.makeText(
-                context,
-                "You have already tried to apply this one if you want Reapply hold job",
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            if (id in jobModel.yourJoblist) {
-                itemClickOption(id)
-            } else {
-                if (jobModel.resume.isEmpty()) {
-                    Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
-                } else {
+            Toast.makeText(context, "You have already tried to apply this one if you want Reapply hold job", Toast.LENGTH_LONG).show() }
+        else { if (id in jobModel.yourJoblist) { itemClickOption(id) } else {
                     val intent = Intent(context, HolderActivity::class.java)
                     intent.putExtra("f", 0)
                     intent.putExtra("id", id)
                     requireActivity().startActivity(intent)
-                }
-            }
-        }
+            } }
     }
 
     override fun onReApplied(id: String, applied: Boolean) {
@@ -427,7 +375,7 @@ class HomeFragment : Fragment(), HomeInterface {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_update_phone, null)
         val dialogInput = dialogView.findViewById<EditText>(R.id.editTextNewPhone)
         val dialogOkButton = dialogView.findViewById<Button>(R.id.buttonUpdatePhone)
-        val dialog = AlertDialog.Builder(context).setView(dialogView).create()
+         dialog.setView(dialogView)
         dialog.setCancelable(false)
         dialogOkButton.setOnClickListener {
             val newPhoneNumber = dialogInput.text.toString()
@@ -439,5 +387,37 @@ class HomeFragment : Fragment(), HomeInterface {
         dialog.show()
     }
 
+    private fun setRecyclear() {
+        jobModel.getAllJob()
+        authModel.getUser(requireActivity()).observe(viewLifecycleOwner) { u ->
+            when (u) {
+                is UserResult.Success -> {
+                    val data = u.user
+                    jobModel.yourJoblist = data.job
+                    jobModel.appliedJobList = data.youApply
+                    jobModel.resume = data.resume
+                    jobModel.getJob.observe(viewLifecycleOwner) {
+                        jobModel.list = it
+                        adapter = AdapterForHome(requireContext(), jobModel.getJob, jobModel.yourJoblist,
+                            jobModel.appliedJobList, this
+                        )
+                        binding.rcJob.adapter = adapter
+                    }
+                    if (u.user.phNo.isEmpty())
+                        phoneNoDialog()
+                }
+
+                is UserResult.Error -> {
+                    Toast.makeText(requireContext(), "User Data Error", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setRecyclear()
+    }
 
 }

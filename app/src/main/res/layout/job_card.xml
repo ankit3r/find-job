@@ -13,41 +13,35 @@
         <TextView
             android:id="@+id/cardTextTitle"
             style="@style/textStyle_20sp_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center" />
 
         <TextView
             android:id="@+id/cardTxtCyName"
             style="@style/textStyle_18sp"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cardTextTitle" />
+            android:layout_below="@id/cardTextTitle"
+            android:textAlignment="center" />
 
         <TextView
             android:id="@+id/cardTxtJobType"
             style="@style/textStyle_18sp"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cardTxtCyName" />
+            android:layout_below="@id/cardTxtCyName"
+            android:textAlignment="center" />
 
         <TextView
             android:id="@+id/cardTxtPay"
             style="@style/textStyle_16sp"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/cardTxtJobType"
+            android:textAlignment="center"
             android:textColor="#06810B" />
 
-        <TextView
-            android:id="@+id/cartTxtApplyed"
-            style="@style/textStyle_16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/cardTxtPay"
-            android:layout_below="@id/cardTxtJobType"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:textAlignment="textEnd" />
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

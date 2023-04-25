@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,7 +11,7 @@
         android:id="@+id/filterLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/darker_gray"
+        android:background="@color/black"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +31,8 @@
                     android:id="@+id/layout_btnFilter1"
                     style="@style/cardStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/white">
 
                     <Spinner
                         android:id="@+id/btnFilter1"
@@ -38,7 +40,8 @@
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/black"
                         android:minWidth="100dp"
-                        android:minHeight="25dp" />
+                        android:minHeight="48dp"
+                        android:textAlignment="center" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -46,14 +49,17 @@
                     style="@style/cardStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/layout_btnFilter1">
+                    android:layout_toEndOf="@id/layout_btnFilter1"
+                    app:cardBackgroundColor="@color/white">
 
                     <Spinner
                         android:id="@+id/btnFilter2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/black"
-                        android:minWidth="100dp" />
+                        android:minWidth="100dp"
+                        android:minHeight="48dp"
+                        android:textAlignment="center" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -61,14 +67,17 @@
                     style="@style/cardStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/layout_btnFilter2">
+                    android:layout_toEndOf="@id/layout_btnFilter2"
+                    app:cardBackgroundColor="@color/white">
 
                     <Spinner
                         android:id="@+id/btnFilter3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/black"
-                        android:minWidth="100dp" />
+                        android:minWidth="100dp"
+                        android:minHeight="48dp"
+                        android:textAlignment="center" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -86,11 +95,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:minHeight="48dp"
                         android:paddingStart="10dp"
                         android:paddingTop="5dp"
                         android:paddingEnd="10dp"
                         android:paddingBottom="5dp"
                         android:text="@string/filter"
+                        android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="18sp" />
                 </androidx.cardview.widget.CardView>

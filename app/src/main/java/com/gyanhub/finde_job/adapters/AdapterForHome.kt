@@ -39,11 +39,6 @@ class AdapterForHome(
 
             binding.apply {
                 job.apply {
-                    if (job.jobId in yourJobList) {
-                        cartTxtApplyed.text = context.getString(R.string.your_post)
-                    }else if (job.jobId in appliedJobList) {
-                        cartTxtApplyed.text = context.getString(R.string.applied)
-                    }
                     cardTextTitle.text = jobTitle
                     cardTxtCyName.text =
                         context.getString(R.string.job_title_and_state, jobCyName, city, state)

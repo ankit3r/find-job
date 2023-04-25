@@ -50,15 +50,16 @@
                     android:id="@+id/cardEmail"
                     style="@style/cardStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#B572F8">
 
                     <EditText
-                        style="@style/textStyle_20sp"
                         android:id="@+id/editTextTextEmailAddress"
+                        style="@style/textStyle_20sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:textColorHint="@color/white"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
                         android:ems="10"
                         android:hint="@string/enter_email"
                         android:inputType="textEmailAddress"
@@ -69,16 +70,17 @@
                     android:id="@+id/cardPass"
                     style="@style/cardStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#B572F8">
 
                     <EditText
-                        style="@style/textStyle_20sp"
                         android:id="@+id/password_toggle"
+                        style="@style/textStyle_20sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
                         android:ems="10"
-                        android:textColorHint="@color/white"
                         android:hint="@string/enter_password"
                         android:inputType="textPassword"
                         android:minHeight="49dp" />

@@ -33,6 +33,7 @@ class FragmentHolderActivity : AppCompatActivity() {
         if(currentUser != null){
             if(currentUser.isEmailVerified){
                 startActivity(Intent(this@FragmentHolderActivity, MainActivity::class.java))
+                finish()
             }
 
         }

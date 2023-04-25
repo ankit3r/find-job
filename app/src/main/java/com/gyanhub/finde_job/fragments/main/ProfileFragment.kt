@@ -16,11 +16,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.activity.FragmentHolderActivity
 import com.gyanhub.finde_job.activity.HolderActivity
+import com.gyanhub.finde_job.activity.comp.LoaderClass
 import com.gyanhub.finde_job.databinding.FragmentMenuBinding
 import com.gyanhub.finde_job.utils.UserResult
 import com.gyanhub.finde_job.viewModle.AuthViewModel
 import com.gyanhub.finde_job.viewModle.DbViewModel
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class ProfileFragment : Fragment() {
@@ -53,7 +56,7 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnLogout.setOnClickListener {
-            auth.logoutUser()
+            auth.logoutUser(requireContext())
             requireActivity().startActivity(Intent(context, FragmentHolderActivity::class.java))
             requireActivity().finish()
         }
@@ -74,20 +77,25 @@ class ProfileFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 505 && resultCode == RESULT_OK) {
-            // Get the selected file URI
+          val loader = LoaderClass(requireContext())
+            loader.loading("Uploading Resume...")
+            loader.showLoder()
             val fileUri = data?.data
-            auth.uploadResume(fileUri!!) { success, error, _ ->
-                if (success) {
-                    binding.txtUserResume.text = getString(R.string.download_resume)
-                    userData()
-                } else {
-                    Toast.makeText(context, "Error $error", Toast.LENGTH_SHORT).show()
-                }
-            }
+           CoroutineScope(Dispatchers.IO).launch {
+               auth.uploadResume(fileUri!!) { success, error, _ ->
+                   if (success) {
+                       binding.txtUserResume.text = getString(R.string.download_resume)
+                       userData()
+                       loader.hideLoder()
+                   } else {
+                       loader.hideLoder()
+                       Toast.makeText(context, "Error $error", Toast.LENGTH_SHORT).show()
+                   }
+               }
+           }
 
         }
     }
-
 
     private fun userData(){
         val user = auth.getUser(requireActivity())
@@ -116,6 +124,11 @@ class ProfileFragment : Fragment() {
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        userData()
     }
 
 }

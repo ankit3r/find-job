@@ -168,23 +168,21 @@ class DbViewModel : ViewModel() {
         return jobRepository.viewPdf(url)
     }
 
-    fun appliedForJob(uid: String, jobId: String, user: User, context: Context): Boolean {
-        var success = false
+    fun appliedForJob(uid: String, jobId: String, user: User, context: Context,callback: (Boolean) -> Unit){
         val loader = LoaderClass(context)
         loader.loading("Sending data...")
         loader.showLoder()
         jobRepository.appliedForJob(uid,jobId, user) { s, e ->
             if (s) {
                 loader.hideLoder()
+                callback(true)
                 toastMessage(context, "Done. next Send message on whatsapp")
-                success = true
             } else {
                 loader.hideLoder()
+                callback(false)
                 toastMessage(context, e)
-                success = false
             }
         }
-        return success
     }
 
     fun viewApplicantList(jobId:String,context: Context):LiveData<ApplicantViewResult>{

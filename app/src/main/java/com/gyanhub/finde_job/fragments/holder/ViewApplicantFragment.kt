@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.gyanhub.finde_job.activity.comp.LoaderClass
+import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.adapters.ApplicantAdapter
 import com.gyanhub.finde_job.adapters.onClickInterface.ApplicantInterFace
 import com.gyanhub.finde_job.databinding.FragmentViewApplicantBinding
@@ -39,8 +39,8 @@ class ViewApplicantFragment : Fragment(), ApplicantInterFace {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (isAdded) requireActivity().title = getString(R.string.applicant)
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
-
         dbModel.viewApplicantList(jobId!!, requireContext()).observe(viewLifecycleOwner) { d ->
             when (d) {
                 is ApplicantViewResult.Success -> {

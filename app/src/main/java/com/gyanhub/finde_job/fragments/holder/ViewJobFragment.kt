@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.gyanhub.finde_job.R
+import com.gyanhub.finde_job.activity.comp.LoaderClass
 import com.gyanhub.finde_job.databinding.FragmentViewJobBinding
 import com.gyanhub.finde_job.databinding.LayoutApplyBinding
 import com.gyanhub.finde_job.utils.UserResult
@@ -32,6 +33,7 @@ class ViewJobFragment: Fragment() {
     private lateinit var dbModel: DbViewModel
     private lateinit var userDb: AuthViewModel
     private lateinit var dialog: AlertDialog
+    private lateinit var loading: LoaderClass
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -39,25 +41,26 @@ class ViewJobFragment: Fragment() {
         jobId = arguments?.getString("jobId")!!
         v = arguments?.getBoolean("view")!!
         re = arguments?.getBoolean("reApply")!!
+        loading = LoaderClass(requireContext())
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (isAdded) requireActivity().title = getString(R.string.job_details)
         dbModel = ViewModelProvider(this)[DbViewModel::class.java]
         userDb = ViewModelProvider(this)[AuthViewModel::class.java]
         progressBar()
-        if (v) {
-            binding.btnApplied.visibility = View.GONE
-        }
+        if (v) binding.btnApplied.visibility = View.GONE
         if (re) {
-            binding.btnApplied.text = "ReApply Now"
+            binding.btnApplied.visibility = View.GONE
+            binding.txtNextStep.visibility = View.VISIBLE
+            if (isAdded) binding.txtNextStep.text = getString(R.string.nextStepReapply)
+            binding.btnWhatsapp.visibility = View.VISIBLE
         }
         if (dbModel.life) {
-            dbModel.showProgressBar()
-            dbModel.progressBarVisible.observe(viewLifecycleOwner) {
-                if (it) dialog.show() else dialog.dismiss()
-            }
+            loading.loading("Loading Data...")
+            loading.showLoder()
             dbModel.getJobById(jobId!!) { success, data, _ ->
                 if (success && data != null) {
                     data.apply {
@@ -75,10 +78,9 @@ class ViewJobFragment: Fragment() {
                         }
                         dbModel.phNo = whNo
                     }
-                    dbModel.hideProgressBar()
+                    loading.hideLoder()
+                } else loading.hideLoder()
 
-                } else
-                    dbModel.hideProgressBar()
 
             }
         }
@@ -87,8 +89,14 @@ class ViewJobFragment: Fragment() {
                 when (u) {
                     is UserResult.Success -> {
                         val tokenId = u.user.jobAppliedToken
-                       val applied = dbModel.appliedForJob(tokenId,jobId!!,u.user,requireContext())
-                        if (applied) bottomSheet()
+                        if (u.user.resume.isEmpty())
+                            Toast.makeText(context, "Upload resume first", Toast.LENGTH_SHORT).show()
+                        else dbModel.appliedForJob(tokenId,jobId!!,u.user,requireContext()){
+                            if (it){
+                                binding.txtNextStep.visibility = View.VISIBLE
+                                binding.btnWhatsapp.visibility = View.VISIBLE
+                            }
+                        }
                     }
                     is UserResult.Error -> {
                         Toast.makeText(requireContext(), "User Data Error", Toast.LENGTH_SHORT)
@@ -97,6 +105,7 @@ class ViewJobFragment: Fragment() {
                 }
             }
         }
+        binding.btnWhatsapp.setOnClickListener { bottomSheet() }
     }
 
     private fun progressBar() {
@@ -133,11 +142,7 @@ class ViewJobFragment: Fragment() {
                         startActivity(intent)
                         if (!re) { dbModel.appliedJob(jobId!!) { success, error ->
                                 if (success) {
-                                    Toast.makeText(
-                                        context,
-                                        "Thank you for applied. You wait for replayed",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(context, "Thank you for applied. You wait for replayed", Toast.LENGTH_SHORT).show()
                                 } else {
                                     Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
                                 }

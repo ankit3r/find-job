@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import com.gyanhub.finde_job.R
 import com.gyanhub.finde_job.databinding.ActivityHolderBinding
 import com.gyanhub.finde_job.fragments.holder.PdfLoadFragment
+import com.gyanhub.finde_job.fragments.holder.PostJobFragment
 import com.gyanhub.finde_job.fragments.holder.ViewApplicantFragment
 import com.gyanhub.finde_job.fragments.holder.ViewJobFragment
 
@@ -28,6 +29,7 @@ class HolderActivity : AppCompatActivity() {
             2 -> setFragment(jobId,false,true,ViewJobFragment())
             3->viewPdfFragment(PdfLoadFragment(),pdfUrl)
             4->viewApplicantFragment(ViewApplicantFragment(),jobId)
+            5->  setFragment(PostJobFragment())
         }
     }
 

@@ -32,15 +32,15 @@ class AuthViewModel : ViewModel() {
         authRepository.loginUser(email, password, callback)
     }
 
-    fun logoutUser() {
-        authRepository.logoutUser()
+    fun logoutUser(context: Context) {
+        authRepository.logoutUser(context)
     }
 
 
     fun getUser(context: Context): LiveData<UserResult> {
         val userResult = MutableLiveData<UserResult>()
         val loaderClass = LoaderClass(context)
-        Log.d("ANKIT","user data")
+        Log.d("ANKIT", "user data")
         loaderClass.loading("Loading")
         loaderClass.showLoder()
         authRepository.getUserData { b, u, e ->
@@ -56,8 +56,16 @@ class AuthViewModel : ViewModel() {
         return userResult
     }
 
-    fun uploadResume(fileUri: Uri, callback: (Boolean, String, String) -> Unit) {
+    suspend fun uploadResume(fileUri: Uri, callback: (Boolean, String, String) -> Unit) {
         authRepository.uploadResume(fileUri, callback)
+    }
+
+    suspend fun updateResume(
+        resumeUrl: String,
+        fileUri: Uri,
+        callback: (Boolean, String, String) -> Unit
+    ) {
+        authRepository.deleteResume(resumeUrl, fileUri, callback)
     }
 
 
@@ -68,6 +76,7 @@ class AuthViewModel : ViewModel() {
         authRepository.updatePhNo(no) { s, e ->
             if (s) {
                 loading.hideLoder()
+                getUser(context)
                 Toast.makeText(context, "Updated...", Toast.LENGTH_SHORT).show()
             } else {
                 loading.hideLoder()

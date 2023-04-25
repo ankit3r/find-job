@@ -41,7 +41,7 @@
     <string name="we_need_send_your_profile_data_to_the_organization_s_hr">We need send your profile data to the organization\'s HR</string>
     <string name="view_response">View Response</string>
     <string name="w">h</string>
-    <string name="view_full_details">view full details</string>
+    <string name="view_full_details">view Applicant</string>
     <string name="delete">Delete</string>
     <string name="error_massage">You Haven\'t applied any Job</string>
     <string name="reapply">Reapply</string>
@@ -54,4 +54,13 @@
     <string name="save_you_phone_no">Save you phone No</string>
     <string name="no_applicant">No one applied yet.</string>
     <string name="close_pdfview">close pdfView</string>
+    <string name="apply_now">Apply Now</string>
+    <string name="whatsapp">Whatsapp</string>
+    <string name="nextStep">Next Step. You need to send message on Whatsapp.</string>
+    <string name="nextStepReapply">if you want to reapply send message on whatsapp.</string>
+    <string name="resume">Resume</string>
+    <string name="job_details">Job Details</string>
+    <string name="applicant">Applicant</string>
+
+
 </resources>

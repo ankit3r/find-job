@@ -131,7 +131,29 @@
                 android:layout_marginTop="13dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="15dp"
-                android:text="Apply Now" />
+                android:text="@string/apply_now" />
+            <TextView
+                style="@style/textStyle_18sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtNextStep"
+                android:text="@string/nextStep"
+                android:textAlignment="center"
+                android:visibility="gone"
+                android:layout_below="@+id/btnApplied" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWhatsapp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtNextStep"
+                android:layout_marginStart="15dp"
+                app:icon="@drawable/ic_whatsapp"
+                android:visibility="gone"
+                android:backgroundTint="@android:color/holo_green_dark"
+                android:layout_marginTop="13dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="15dp"
+                android:text="@string/whatsapp" />
 
 
         </RelativeLayout>
