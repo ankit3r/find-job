@@ -22,7 +22,7 @@ class DbRepository {
     private val auth = FirebaseAuth.getInstance()
     private var jobCollection = firestore.collection("Job")
 
-    suspend fun postJob(jobTitle: String, jobCyName: String, jobPostOpportunitity: String,
+     fun postJob(jobTitle: String, jobCyName: String, jobPostOpportunitity: String,
         whNo: String, jobDisc: String, whoCanApply: String, skils: List<String>, pay: String,
         filterPay: Int, jobType: String, state: String, city: String, callback: (Boolean, String) -> Unit
     ) {
@@ -41,7 +41,7 @@ class DbRepository {
             }
     }
 
-    suspend fun getAllJob(callback: (Boolean, List<Job>, String) -> Unit) {
+     fun getAllJob(callback: (Boolean, List<Job>, String) -> Unit) {
         val jobLiveData = mutableListOf<Job>()
         jobCollection.orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { jobs, error ->
@@ -61,7 +61,7 @@ class DbRepository {
 
 
 
-    suspend fun getYourJob(
+     fun getYourJob(
         documentIds: List<String>,
         callback: (Boolean, List<Job>?, String) -> Unit
     ) {
@@ -242,14 +242,12 @@ class DbRepository {
             }
     }
 
-    suspend fun viewPdf(url: String): InputStream {
-        return withContext(Dispatchers.IO) {
-            val connection = URL(url).openConnection() as HttpURLConnection
+     fun viewPdf(url: String): InputStream {
+         val connection = URL(url).openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
             connection.connect()
-            connection.inputStream
-        }
-    }
+         return connection.inputStream
+     }
 
     fun appliedForJob(uid:String,jobId: String, user: User, callback: (Boolean, String) -> Unit) {
         val jobRef = jobCollection.document(jobId)

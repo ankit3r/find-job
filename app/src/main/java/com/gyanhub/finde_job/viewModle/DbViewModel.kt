@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.gyanhub.finde_job.activity.comp.LoaderClass
 import com.gyanhub.finde_job.model.Job
 import com.gyanhub.finde_job.model.User
@@ -71,8 +70,7 @@ class DbViewModel : ViewModel() {
         city: String,
         callback: (Boolean, String) -> Unit
     ) {
-        viewModelScope.launch {
-            jobRepository.postJob(
+        jobRepository.postJob(
                 jobTitle,
                 jobCyName,
                 jobPostOpportunitity,
@@ -87,7 +85,6 @@ class DbViewModel : ViewModel() {
                 city,
                 callback
             )
-        }
     }
 
     var data = MutableLiveData<List<Job>>()
@@ -98,15 +95,12 @@ class DbViewModel : ViewModel() {
         get() = data2
 
     fun getAllJob() {
-        viewModelScope.launch {
             jobRepository.getAllJob { b, liveData, _ ->
                 if (b) data.postValue(liveData)
             }
-        }
     }
 
     fun getYourJobs(list: List<String>?, collback: (Boolean, String) -> Unit) {
-        viewModelScope.launch {
             if (!list.isNullOrEmpty()) {
                 jobRepository.getYourJob(list) { b, liveData, s ->
                     if (b) {
@@ -116,7 +110,6 @@ class DbViewModel : ViewModel() {
                     collback(true, "error")
                 }
             }
-        }
     }
 
     fun singlFieldFilter(

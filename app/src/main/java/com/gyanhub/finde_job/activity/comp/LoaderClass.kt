@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.TextView
@@ -15,22 +17,28 @@ class LoaderClass(private val context: Context) {
     @SuppressLint("InflateParams")
     private val view = LayoutInflater.from(context).inflate(R.layout.custome_progress_bar, null)
     private val messageTextView = view.findViewById<TextView>(R.id.txtError)
-   private lateinit var dialog : AlertDialog
+    private lateinit var dialog: AlertDialog
 
+    private val handler = Handler(Looper.getMainLooper())
 
-    fun loading(massage: String) {
-        messageTextView.text = massage
-        builder.setView(view)
-        builder.setCancelable(false)
-         dialog = builder.create()
+    fun loading(message: String) {
+        handler.post {
+            messageTextView.text = message
+            builder.setView(view)
+            builder.setCancelable(false)
+            dialog = builder.create()
+        }
     }
 
     fun showLoder() {
-        dialog.show()
+        handler.post {
+            dialog.show()
+        }
     }
 
     fun hideLoder() {
-        dialog.dismiss()
+        handler.post {
+            dialog.dismiss()
+        }
     }
-
 }
