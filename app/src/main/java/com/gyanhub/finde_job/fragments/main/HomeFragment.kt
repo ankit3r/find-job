@@ -207,7 +207,6 @@ class HomeFragment : Fragment(), HomeInterface {
         searchView.queryHint = resources.getString(R.string.hintSearchMess)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-
             override fun onQueryTextSubmit(query: String?): Boolean {
                 adapter.filter.filter(query)
                 hideKeyboard()

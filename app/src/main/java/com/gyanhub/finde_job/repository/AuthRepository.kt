@@ -130,12 +130,7 @@ class AuthRepository {
     }
 
     fun deleteResume(resumeUrl: String, fileUri: Uri, callback: (Boolean, String, String) -> Unit) {
-        val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(resumeUrl)
-        storageRef.delete().addOnSuccessListener {
-            uploadResume(fileUri, callback)
-        }.addOnFailureListener {
-            callback(false, "Uploading Failed...",resumeUrl)
-        }
+        uploadResume(fileUri, callback)
     }
 
 }

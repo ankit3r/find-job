@@ -2,5 +2,6 @@
     android:id="@+id/spinner_item_text"
     style="@style/spineerTextStyle_16sp"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="wrap_content"
     android:textAlignment="center" />

@@ -77,7 +77,7 @@ class ProfileFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 505 && resultCode == RESULT_OK) {
-          val loader = LoaderClass(requireContext())
+            val loader = LoaderClass(requireContext())
             loader.loading("Uploading Resume...")
             loader.showLoder()
             val fileUri = data?.data

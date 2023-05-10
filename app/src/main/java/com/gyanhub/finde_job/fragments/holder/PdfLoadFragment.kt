@@ -85,7 +85,7 @@ class PdfLoadFragment : Fragment() {
     }
 
     private fun loadPdf(url: String) {
-      val loading = LoaderClass(requireContext())
+        val loading = LoaderClass(requireContext())
         loading.loading("Loading Pdf...")
         loading.showLoder()
 
