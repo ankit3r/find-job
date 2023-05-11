@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -32,13 +33,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.UUID
 
 class PdfLoadFragment : Fragment() {
     private var _binding: FragmentPdfLoadBinding? = null
     private val binding get() = _binding!!
     private lateinit var dbModel: DbViewModel
     private lateinit var authModel: AuthViewModel
-    private var resumeUrl :String? = null
+    private var resumeUrl: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,7 +67,7 @@ class PdfLoadFragment : Fragment() {
                     intent.putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().packageName)
                     startActivity(intent)
                 }
-            } else CoroutineScope(Dispatchers.IO).launch {downloadResume(arguments?.getString("pdf")!!) }
+            } else CoroutineScope(Dispatchers.IO).launch { downloadResume(arguments?.getString("pdf")!!) }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -88,22 +90,21 @@ class PdfLoadFragment : Fragment() {
         val loading = LoaderClass(requireContext())
         loading.loading("Loading Pdf...")
         loading.showLoder()
-
         lifecycleScope.launch {
             try {
                 val pdfStream = dbModel.viewPdf(url)
                 binding.pdfView.fromStream(pdfStream).load()
-             loading.hideLoder()
+                loading.hideLoder()
             } catch (e: Exception) {
-              loading.hideLoder()
+                loading.hideLoder()
                 Toast.makeText(context, "Failed to load PDF", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private suspend fun downloadResume(uri: String) {
+    private fun downloadResume(uri: String) {
         val storageRef = Firebase.storage.getReferenceFromUrl(uri)
-        val filename = "MyResume.pdf"
+        val filename = "${UUID.randomUUID()} - Resume.pdf"
         val directory =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File(directory, filename)
@@ -165,25 +166,28 @@ class PdfLoadFragment : Fragment() {
         intent.type = "application/pdf"
         startActivityForResult(Intent.createChooser(intent, "Select PDF"), 505)
     }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 505 && resultCode == Activity.RESULT_OK) {
-             val loading = LoaderClass(requireContext())
+            val loading = LoaderClass(requireContext())
             loading.loading("Updating Resume.... ")
             loading.showLoder()
             val fileUri = data?.data
-          CoroutineScope(Dispatchers.IO).launch { authModel.updateResume(resumeUrl!!,fileUri!!) { success, error, url ->
-              if (success) {
-                  loading.hideLoder()
-                  resumeUrl = url
-                  loadPdf(resumeUrl!!)
+            CoroutineScope(Dispatchers.IO).launch {
+                authModel.updateResume(resumeUrl!!, fileUri!!) { success, error, url ->
+                    if (success) {
+                        loading.hideLoder()
+                        resumeUrl = url
+                        loadPdf(resumeUrl!!)
 
-              } else {
-                  loading.hideLoder()
-                  Toast.makeText(context, "Error $error", Toast.LENGTH_SHORT).show()
-              }
-          } }
+                    } else {
+                        loading.hideLoder()
+                        Toast.makeText(context, "Error $error", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
 
         }
     }

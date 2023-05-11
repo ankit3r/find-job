@@ -157,7 +157,7 @@ class DbViewModel : ViewModel() {
         jobRepository.appliedJob(id, callback)
     }
 
-    suspend fun viewPdf(url: String): InputStream {
+     suspend fun viewPdf(url: String): InputStream {
         return jobRepository.viewPdf(url)
     }
 

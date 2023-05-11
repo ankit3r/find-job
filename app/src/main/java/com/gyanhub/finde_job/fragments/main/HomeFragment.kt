@@ -59,6 +59,12 @@ class HomeFragment : Fragment(), HomeInterface {
         adapter = AdapterForHome(requireContext(), jobModel.getJob, jobModel.yourJoblist,
             jobModel.appliedJobList, this
         )
+        jobModel.getJob.observe(viewLifecycleOwner){
+          if (it.isEmpty()) {
+              binding.txtMassage.visibility = View.VISIBLE
+              binding.txtMassage.text = getString(R.string.no_data)
+          }else  binding.txtMassage.visibility = View.GONE
+        }
         dialog = AlertDialog.Builder(context).create()
         return binding.root
     }

@@ -61,6 +61,7 @@
     <string name="resume">Resume</string>
     <string name="job_details">Job Details</string>
     <string name="applicant">Applicant</string>
+    <string name="no_data">No Data</string>
 
 
 </resources>

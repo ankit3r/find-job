@@ -242,12 +242,12 @@ class DbRepository {
             }
     }
 
-     fun viewPdf(url: String): InputStream {
-         val connection = URL(url).openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-            connection.connect()
-         return connection.inputStream
-     }
+    suspend fun viewPdf(url: String): InputStream = withContext(Dispatchers.IO) {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+        connection.connect()
+        return@withContext connection.inputStream
+    }
 
     fun appliedForJob(uid:String,jobId: String, user: User, callback: (Boolean, String) -> Unit) {
         val jobRef = jobCollection.document(jobId)

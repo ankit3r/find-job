@@ -30,7 +30,9 @@
                 android:ems="10"
                 android:hint="@string/job_title"
                 android:inputType="textPersonName"
-                android:minHeight="49dp" />
+                android:minHeight="49dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/material_dynamic_neutral80" />
 
             <EditText
                 android:id="@+id/eTxtCyName"
@@ -40,7 +42,9 @@
                 android:ems="10"
                 android:hint="@string/enter_origination_name"
                 android:inputType="textPersonName"
-                android:minHeight="49dp" />
+                android:minHeight="49dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/material_dynamic_neutral80" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -73,7 +77,9 @@
                 android:gravity="start|center"
                 android:hint="@string/enter_city_name"
                 android:inputType="text"
-                android:minHeight="49dp" />
+                android:minHeight="49dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/material_dynamic_neutral80" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -94,7 +100,9 @@
                     android:inputType="date"
                     android:minHeight="49dp"
                     android:paddingStart="10dp"
-                    android:paddingEnd="10dp" />
+                    android:paddingEnd="10dp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/material_dynamic_neutral80" />
 
                 <EditText
                     android:id="@+id/eTxtTotalPost"
@@ -107,7 +115,9 @@
                     android:inputType="number"
                     android:minHeight="49dp"
                     android:paddingStart="10dp"
-                    android:paddingEnd="10dp" />
+                    android:paddingEnd="10dp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/material_dynamic_neutral80" />
             </LinearLayout>
 
 
@@ -120,7 +130,9 @@
                 android:gravity="start|center"
                 android:hint="@string/enter_job_description"
                 android:inputType="textMultiLine"
-                android:minHeight="49dp" />
+                android:minHeight="49dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/material_dynamic_neutral80" />
 
             <EditText
                 android:id="@+id/eTxtSkill"
@@ -131,7 +143,9 @@
                 android:gravity="start|center"
                 android:hint="@string/enter_skill"
                 android:inputType="text"
-                android:minHeight="49dp" />
+                android:minHeight="49dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/material_dynamic_neutral80" />
 
             <EditText
                 android:id="@+id/eTxtWCA"
@@ -142,7 +156,9 @@
                 android:gravity="start|center"
                 android:hint="@string/enter_who_can_apply"
                 android:inputType="textMultiLine"
-                android:minHeight="49dp" />
+                android:minHeight="49dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/material_dynamic_neutral80" />
 
             <EditText
                 android:id="@+id/eTxtWhNo"
